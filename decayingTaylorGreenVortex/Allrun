@@ -1,0 +1,181 @@
+#!/bin/bash
+
+# Source required functions
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+source solids4FoamScripts.sh
+
+# Build the meshmotion library
+wmake -s libso decayingTaylorGreenVortexMeshMotion
+
+# Build the solution initialisation utility
+wmake -s initialiseTaylorGreenVortex
+
+# Define configurations as space-separated strings
+configs=(
+    "BASE=base NAME=hex.lu MOVING_MESH=0 PETSC_FILE=petscOptions.lu"
+)
+
+# Define start and end mesh indices
+# Mesh input files are defined from 1 to 5
+# END_MESH should be greater than START_MESH
+START_MESH=1
+END_MESH=2
+
+# Detect the CPU type: we append this to the case name
+if [[ "$OSTYPE" == "darwin"* ]]
+then
+    # macOS
+    CPU_TYPE=$(sysctl -n machdep.cpu.brand_string | sed 's/[^a-zA-Z0-9]/_/g')
+elif [[ -f /proc/cpuinfo ]]
+then
+    # Linux
+    CPU_TYPE=$(grep -m 1 "model name" /proc/cpuinfo | awk -F': ' '{print $2}' | sed 's/[^a-zA-Z0-9]/_/g')
+else
+    # Fallback if neither method works
+    CPU_TYPE="Unknown_CPU"
+fi
+
+
+# Create timestamped working directory for this run
+DATE=$(date +%Y%m%d_%H%M%S)
+RUN_DIR="run_${CPU_TYPE}_${DATE}"
+echo "Creating ${RUN_DIR}"
+mkdir "${RUN_DIR}"
+
+# Enter the run directory
+cd "${RUN_DIR}"
+
+# Iterate through configurations
+for config in "${configs[@]}"
+do
+    # Parse the configuration string
+    eval $config
+    echo; echo "***************************************"
+    echo "Running configuration: $config"
+    echo "***************************************"
+
+    # Define results summary file name
+    SUMMARY="${NAME}.summary.txt"
+    echo "# Mesh Time Mem U_L1 U_L2 U_Linf" > "${SUMMARY}"
+
+    # Loop over mesh densities in each configuration
+    for i in `seq $START_MESH $END_MESH`
+    do
+        CASE="${NAME}.$i"
+        echo; echo "Processing case: $CASE"
+
+        # Prepare the case
+        cp -r "../${BASE}" "${CASE}"
+        cd "$CASE"
+
+        # Set the dynamicMeshDict
+        if [ "$MOVING_MESH" -eq 1 ]
+        then
+            echo "Copying constant/dynamicMeshDict.moving to constant/dynamicMeshDict"
+            \cp constant/dynamicMeshDict.moving constant/dynamicMeshDict
+        else
+            echo "Copying constant/dynamicMeshDict.static to constant/dynamicMeshDict"
+            \cp constant/dynamicMeshDict.static constant/dynamicMeshDict
+        fi
+
+        # Replace the blockMeshDict
+        if [[ ! -f "system/blockMeshDict.$i" ]]
+        then
+            echo "Cannot find ${CASE}/system/blockMeshDict.$i: please add it to ${BASE}/meshes/"; echo
+            exit 1;
+        else
+            echo "Copying ${CASE}/system/blockMeshDict.$i to ${CASE}/system/blockMeshDict"
+            \cp "system/blockMeshDict.$i" system/blockMeshDict
+            rm -f constant/polyMesh/blockMeshDict
+        fi
+
+        # Copy 0.orig to 0
+        cp -r 0.orig 0
+
+        # Create the mesh
+        solids4Foam::runApplication blockMesh
+
+        # Initialie the velocity and pressure initial fields with the analytical
+        # solutions
+        solids4Foam::runApplication initialiseTaylorGreenVortex
+
+        # Update the PETSc options file
+        if [ -n "${PETSC_FILE}" ]; then
+            sed -i "/^\s*optionsFile /s|^.*|    optionsFile ${PETSC_FILE};|" constant/fluidProperties
+        fi
+
+        # Run the solver
+        # If "gtime" is available (could be called "time" on Linux), use it to
+        # record the max memory usage
+        if command -v gtime &> /dev/null
+        then
+            echo "Running solids4Foam on ${CASE} with gtime"
+            gtime -f "Maximum resident set size (kbytes): %M" solids4Foam &> log.solids4Foam
+        elif command -v time &> /dev/null
+        then
+            echo "Running solids4Foam on ${CASE} with time"
+            gtime -f "Maximum resident set size (kbytes): %M" solids4Foam &> log.solids4Foam
+        else
+            echo "Running solids4Foam on ${CASE}"
+            solids4Foam &> log.solids4Foam
+        fi
+
+        # Extract results from solver log and append them to a summary file
+        echo; echo "Appending results to ${SUMMARY}"
+        if grep -q "Maximum resident" log.solids4Foam; then
+            MAX_MEMORY=$(grep "Maximum resident" log.solids4Foam | awk '{print int($6 / 1000)}')
+        else
+            MAX_MEMORY="NaN"
+        fi
+
+        # Record the time
+        CLOCK_TIME=$(grep -n "ClockTime" log.solids4Foam | tail -n 1 | awk '{print $7}')
+
+        # Extract the L1 (average) error for velocity
+        U_L1_ERROR=$(grep -n "mean L1" log.solids4Foam | awk '{print $5}')
+
+        # Extract the L2 (average) error for velocity
+        U_L2_ERROR=$(grep -n "mean L2" log.solids4Foam | awk '{print $5}')
+
+        # Extract the LInfinity (max) error for velocity
+        U_LINF_ERROR=$(grep -n "LInf" log.solids4Foam | awk '{print $4}')
+
+        # Write data to file
+        echo "$i $CLOCK_TIME $MAX_MEMORY $U_L1_ERROR $U_L2_ERROR $U_LINF_ERROR" >> ../"${SUMMARY}"
+
+        cd ..
+    done
+
+    # Print summary file
+    echo; echo "${SUMMARY} file:"; cat "${SUMMARY}"; echo
+
+    # Calculate the order of accuracy from the summary file
+    ORDER="${NAME}.orderOfAccuracy.txt"
+    echo; echo "Creating ${ORDER} file"
+    echo "# Mesh OrderOfAccuracyDisp OrderOfAccuracyStress" > "${ORDER}"
+    awk 'NR > 2 {print NR-2, log(prev4/$4)/log(2), log(prev5/$5)/log(2), log(prev6/$6)/log(2), log(prev7/$7)/log(2)} {prev4=$4; prev5=$5; prev6=$6; prev7=$7}' "${SUMMARY}" >> "${ORDER}"
+    cat "${ORDER}"
+done
+
+# Create plots if gnuplot in installed
+if command -v gnuplot &>/dev/null
+then
+    # Copy gnuplot scripts
+    cp ../plotScripts/*gnuplot .
+    cp ../plotScripts/orderOfAccuracySlopes*.dat .
+
+    # Run all scripts
+    for f in *gnuplot
+    do
+        echo "Running gnuplot on $f"
+        gnuplot "$f"
+    done
+fi
+
+# Exit the run directory
+cd ..
+
+echo; echo; echo "Done!"; echo
+echo "View the PDF files in ${RUN_DIR}"
+echo; echo $(date)
+echo; echo
