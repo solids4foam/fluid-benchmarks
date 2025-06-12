@@ -16,10 +16,12 @@ set xlabel "Average cell spacing (in mm)"
 set ylabel "Order of accuracy"
 set key bottom left;
 
+# Average mesh spacing of mesh1
+dx=0.2
 
 # Assume the mesh spacing is being halved for each succesive mesh
 plot \
-    "hex.lu.orderOfAccuracy.txt" using (1e3*$1):2 skip 1 w lp pt 5 lc "green" t "L_1 - Hex", \
-    "hex.lu.orderOfAccuracy.txt" using (1e3*$1):3 skip 1 w lp pt 5 lc "red" t "L_2 - Hex", \
-    "hex.lu.orderOfAccuracy.txt" using (1e3*$1):4 skip 1 w lp pt 4 lc "blue" t "L_∞ - Hex", \
+    "hex.lu.orderOfAccuracy.txt" using (1e3*dx/(2**($0))):2 skip 1 w lp pt 5 lc "green" t "L_1", \
+    "hex.lu.orderOfAccuracy.txt" using (1e3*dx/(2**($0))):3 skip 1 w lp pt 5 lc "red" t "L_2", \
+    "hex.lu.orderOfAccuracy.txt" using (1e3*dx/(2**($0))):4 skip 1 w lp pt 4 lc "blue" t "L_∞"
 

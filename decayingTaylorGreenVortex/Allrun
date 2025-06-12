@@ -152,8 +152,8 @@ do
     # Calculate the order of accuracy from the summary file
     ORDER="${NAME}.orderOfAccuracy.txt"
     echo; echo "Creating ${ORDER} file"
-    echo "# Mesh OrderOfAccuracyDisp OrderOfAccuracyStress" > "${ORDER}"
-    awk 'NR > 2 {print NR-2, log(prev4/$4)/log(2), log(prev5/$5)/log(2), log(prev6/$6)/log(2), log(prev7/$7)/log(2)} {prev4=$4; prev5=$5; prev6=$6; prev7=$7}' "${SUMMARY}" >> "${ORDER}"
+    echo "# Mesh L1 L2 LInf" > "${ORDER}"
+    awk 'NR > 2 {print NR-2, log(prev4/$4)/log(2), log(prev5/$5)/log(2), log(prev6/$6)/log(2)} {prev4=$4; prev5=$5; prev6=$6}' "${SUMMARY}" >> "${ORDER}"
     cat "${ORDER}"
 done
 
