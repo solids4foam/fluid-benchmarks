@@ -12,7 +12,7 @@ wmake -s initialiseTaylorGreenVortex
 
 # Define configurations as space-separated strings
 configs=(
-    "BASE=base NAME=hex.lu MOVING_MESH=1 PIMPLEFOAM=0 PETSC_FILE=petscOptions.lu"
+    "BASE=base NAME=hex.lu MOVING_MESH=1 PIMPLEFOAM=1 PETSC_FILE=petscOptions.lu"
 )
 
 # Define start and end mesh indices
