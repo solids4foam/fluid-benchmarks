@@ -71,7 +71,16 @@ Foam::decayingTaylorGreenVortexMeshMotion::decayingTaylorGreenVortexMeshMotion
 :
     displacementMotionSolver(mesh, dict, typeName),
     fvMotionSolver(mesh),
-    A_(dict.lookupOrDefault<scalar>("A", 0.1))
+    A_
+    (
+        readScalar
+        (
+            dict.subDict
+            (
+                "decayingTaylorGreenVortexMeshMotionCoeffs"
+            ).lookup("scaleFactor")
+        )
+    )
 {}
 
 
@@ -85,9 +94,17 @@ Foam::decayingTaylorGreenVortexMeshMotion::decayingTaylorGreenVortexMeshMotion
 :
     displacementMotionSolver(mesh, dict, pointDisplacement, points0, typeName),
     fvMotionSolver(mesh),
-    A_(dict.lookupOrDefault<scalar>("A", 0.1))
-{
-}
+    A_
+    (
+        readScalar
+        (
+            dict.subDict
+            (
+                "decayingTaylorGreenVortexMeshMotionCoeffs"
+            ).lookup("scaleFactor")
+        )
+    )
+{}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -128,9 +145,30 @@ void Foam::decayingTaylorGreenVortexMeshMotion::solve()
     const scalarField y(points0.component(vector::Y));
     const scalar t = time().value();
 
-   // Calculate the displacement
+    // Calculate the displacement
     pointDisplacement_.primitiveFieldRef() =
         A_*Foam::sin(pi*t/0.8)*Foam::sin(pi*x)*Foam::sin(pi*y)*vector(1, 1, 0);
+
+    // Set displacements near the boundary to zero for testing
+    // forAll(x, pointI)
+    // {
+    //     if
+    //     (
+    //         x[pointI] < 0.2 || x[pointI] > 0.8
+    //      || y[pointI] < 0.2 || y[pointI] > 0.8
+    //     )
+    //     {
+    //         pointDisplacement_.primitiveFieldRef()[pointI] = vector::zero;
+    //     }
+    //     else
+    //     {
+    //         const scalar X = (x[pointI] - 0.2)/0.6;
+    //         const scalar Y = (y[pointI] - 0.2)/0.6;
+    //         pointDisplacement_.primitiveFieldRef()[pointI] =
+    //             A_*Foam::sin(pi*t/0.8)*Foam::sin(pi*X)*Foam::sin(pi*Y)*vector(1, 1, 0);
+    //     }
+    // }
+
     pointDisplacement_.correctBoundaryConditions();
 }
 

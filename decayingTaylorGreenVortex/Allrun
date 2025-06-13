@@ -12,14 +12,14 @@ wmake -s initialiseTaylorGreenVortex
 
 # Define configurations as space-separated strings
 configs=(
-    "BASE=base NAME=hex.lu MOVING_MESH=0 PETSC_FILE=petscOptions.lu"
+    "BASE=base NAME=hex.lu MOVING_MESH=1 PIMPLEFOAM=0 PETSC_FILE=petscOptions.lu"
 )
 
 # Define start and end mesh indices
 # Mesh input files are defined from 1 to 5
 # END_MESH should be greater than START_MESH
 START_MESH=1
-END_MESH=2
+END_MESH=5
 
 # Detect the CPU type: we append this to the case name
 if [[ "$OSTYPE" == "darwin"* ]]
@@ -99,46 +99,65 @@ do
         # solutions
         solids4Foam::runApplication initialiseTaylorGreenVortex
 
+        # Set the solver
+        SOLVER="solids4Foam"
+
+        # Replace setting files for pimpleFoam
+        if [ "$PIMPLEFOAM" -eq 1 ]
+        then
+            echo "Copying system/fvSolution.pimpleFoam to system/fvSolution"
+            \cp system/fvSolution.pimpleFoam system/fvSolution
+
+            echo "Copying system/fvSchemes.pimpleFoam to system/fvSchemes"
+            \cp system/fvSchemes.pimpleFoam system/fvSchemes
+
+            SOLVER="pimpleFoam"
+        fi
+
         # Update the PETSc options file
         if [ -n "${PETSC_FILE}" ]; then
             sed -i "/^\s*optionsFile /s|^.*|    optionsFile ${PETSC_FILE};|" constant/fluidProperties
         fi
 
+        # Set the log file name
+        LOG="log.$SOLVER"
+
         # Run the solver
         # If "gtime" is available (could be called "time" on Linux), use it to
         # record the max memory usage
+        export DYLD_LIBRARY_PATH="$DYLD_LIBRARY_PATH:$FOAM_LIBBIN:$FOAM_USER_LIBBIN"
         if command -v gtime &> /dev/null
         then
-            echo "Running solids4Foam on ${CASE} with gtime"
-            gtime -f "Maximum resident set size (kbytes): %M" solids4Foam &> log.solids4Foam
+            echo "Running $SOLVER on ${CASE} with gtime"
+            gtime -f "Maximum resident set size (kbytes): %M" $SOLVER &> $LOG
         elif command -v time &> /dev/null
         then
-            echo "Running solids4Foam on ${CASE} with time"
-            gtime -f "Maximum resident set size (kbytes): %M" solids4Foam &> log.solids4Foam
+            echo "Running $SOLVER on ${CASE} with time"
+            gtime -f "Maximum resident set size (kbytes): %M" $SOLVER &> $LOG
         else
-            echo "Running solids4Foam on ${CASE}"
-            solids4Foam &> log.solids4Foam
+            echo "Running $SOLVER on ${CASE}"
+            $SOLVER &> $LOG
         fi
 
         # Extract results from solver log and append them to a summary file
         echo; echo "Appending results to ${SUMMARY}"
-        if grep -q "Maximum resident" log.solids4Foam; then
-            MAX_MEMORY=$(grep "Maximum resident" log.solids4Foam | awk '{print int($6 / 1000)}')
+        if grep -q "Maximum resident" $LOG; then
+            MAX_MEMORY=$(grep "Maximum resident" $LOG | awk '{print int($6 / 1000)}')
         else
             MAX_MEMORY="NaN"
         fi
 
         # Record the time
-        CLOCK_TIME=$(grep -n "ClockTime" log.solids4Foam | tail -n 1 | awk '{print $7}')
+        CLOCK_TIME=$(grep -n "ClockTime" $LOG | tail -n 1 | awk '{print $7}')
 
         # Extract the L1 (average) error for velocity
-        U_L1_ERROR=$(grep -n "mean L1" log.solids4Foam | awk '{print $5}')
+        U_L1_ERROR=$(grep -n "mean L1" $LOG | awk '{print $5}')
 
         # Extract the L2 (average) error for velocity
-        U_L2_ERROR=$(grep -n "mean L2" log.solids4Foam | awk '{print $5}')
+        U_L2_ERROR=$(grep -n "mean L2" $LOG | awk '{print $5}')
 
         # Extract the LInfinity (max) error for velocity
-        U_LINF_ERROR=$(grep -n "LInf" log.solids4Foam | awk '{print $4}')
+        U_LINF_ERROR=$(grep -n "LInf" $LOG | awk '{print $4}')
 
         # Write data to file
         echo "$i $CLOCK_TIME $MAX_MEMORY $U_L1_ERROR $U_L2_ERROR $U_LINF_ERROR" >> ../"${SUMMARY}"
@@ -165,6 +184,7 @@ then
     cp ../plotScripts/orderOfAccuracySlopes*.dat .
 
     # Run all scripts
+    echo
     for f in *gnuplot
     do
         echo "Running gnuplot on $f"

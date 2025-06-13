@@ -5,4 +5,5 @@
 
 wclean initialiseTaylorGreenVortex
 cleanCase0
-rm -rf constant/polyMesh dynamicCode
+rm -rf constant/polyMesh
+#rm -rf dynamicCode
