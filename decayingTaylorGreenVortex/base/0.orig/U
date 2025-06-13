@@ -24,28 +24,28 @@ boundaryField
 {
     walls
     {
-        type            decayingTaylorGreenVortexVelocity;
-        // type            codedFixedValue;
-        // name            decayingTaylorGreenVortexVelocity;
+        //type            decayingTaylorGreenVortexVelocity;
+        type            codedFixedValue;
+        name            decayingTaylorGreenVortexVelocity;
 
-        // code
-        // #{
-        //     const scalar Re = 10;
-        //     const scalar t = db().time().value();
-        //     const scalar pi = constant::mathematical::pi;
-        //     const scalar A = Foam::exp(-2.0*sqr(pi)*t/Re);
+        code
+        #{
+            const scalar Re = 10;
+            const scalar t = db().time().value();
+            const scalar pi = constant::mathematical::pi;
+            const scalar A = Foam::exp(-2.0*sqr(pi)*t/Re);
 
-        //     const scalarField x(patch().Cf().component(vector::X));
-        //     const scalarField y(patch().Cf().component(vector::Y));
+            const scalarField x(patch().Cf().component(vector::X));
+            const scalarField y(patch().Cf().component(vector::Y));
 
-        //     const vectorField velocity
-        //     (
-        //         A*Foam::sin(pi*x)*Foam::cos(pi*y)*vector(1, 0, 0)
-        //       - A*Foam::cos(pi*x)*Foam::sin(pi*y)*vector(0, 1, 0)
-        //     );
+            const vectorField velocity
+            (
+                A*Foam::sin(pi*x)*Foam::cos(pi*y)*vector(1, 0, 0)
+              - A*Foam::cos(pi*x)*Foam::sin(pi*y)*vector(0, 1, 0)
+            );
 
-        //     operator==(velocity);
-        // #};
+            operator==(velocity);
+        #};
 
         value           uniform (0 0 0);
     }
