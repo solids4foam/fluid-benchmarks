@@ -87,7 +87,7 @@ The case contains a function object, which calculates the exact velocity field
  $L_\infty$) at $t = 0.4$ s, as defined at the bottom of
  `system/controlDict`:
 
-```c+
+```c++
 functions
 {
     error
