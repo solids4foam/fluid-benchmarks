@@ -14,7 +14,7 @@ The 2-D, transient Taylor–Green decaying vortex flow has an analytical solutio
  for an incompressible laminar, viscous fluid [1]. Consequently, the case is
  well-suited for benchmarking the accuracy and order of accuracy (spatial and
  temporal) of a discretisation. The spatial domain is taken here as the unit
- square $$[0, 1] \times [0, 1]$$ m and the analytical solution in
+ square $[0, 1] \times [0, 1]$ m and the analytical solution in
  non-dimensional form is given by
 
 $$
@@ -25,10 +25,10 @@ p(x, y, t) =
     \left[\cos(2\pi x) + \sin(2\pi y)\right] + C
 $$
 
-where $$u$$ is the non-dimensional $$x$$ component of velocity, $$v$$ is the
- non-dimensional $$y$$ component of velocity, $$p$$ is the non-dimensional
- pressure, $$t$$ is time, $$Re$$ is the Reynolds number taken here to be $$10$$,
- and $$C$$ is an arbitrary constant.
+where $u$ is the non-dimensional $x$ component of velocity, $v$ is the
+ non-dimensional $y$ component of velocity, $p$ is the non-dimensional
+ pressure, $t$ is time, $Re$ is the Reynolds number taken here to be $10$,
+ and $C$ is an arbitrary constant.
 
 The time-varying analytical solution for velocity is prescribed as a boundary
  condition using the `codedFixedValue` boundary condition as follows:
@@ -63,28 +63,28 @@ The time-varying analytical solution for velocity is prescribed as a boundary
 ```
 
 For pressure, a zero gradient condition is assumed:
- $$\boldsymbol{n} \cdot \boldsymbol{\nabla} p = 0$$;
+ $\boldsymbol{n} \cdot \boldsymbol{\nabla} p = 0$;
  consequently, the pressure field is defined up to a constant. To deal with
  this in the current case, the pressure in the cell closest to the centre of
  the domain is fixed to 0.
 
 A utility called `initialiseTaylorGreenVortex` is provided in the case, which
  initialises the internal velocity and pressure fields to the analytical
- solution at $$t = 0$$ s. The initial velocity magnitude field is shown in
+ solution at $t = 0$ s. The initial velocity magnitude field is shown in
  Figure 1.
 
 ![Taylor-Green vortex initial velocity field](images/taylorGreenVortexMagUTime0.png)
 
 **Figure 1: The velocity magnitude field at the initial time.**
 
-A structured $$20 \times 20$$ quadrilateral mesh is employed constructed with
+A structured $20 \times 20$ quadrilateral mesh is employed constructed with
  `blockMesh`; however, the case contains `blockMeshDict` files with coarser and
  finer resolutions to allow a mesh sensitivity study to be easily performed,
  e.g. ```cp system/blockMeshDict.4 system/blockMeshDict && blockMesh`.
 
 The case contains a function object, which calculates the exact velocity field
- `exactU` and the error norm in the velocity field ($$L_1$$, $$L_2$$, and
- $$L_\infty$$) at $$t = 0.4$$ s, as defined at the bottom of
+ `exactU` and the error norm in the velocity field ($L_1$, $L_2$, and
+ $L_\infty$) at $t = 0.4$ s, as defined at the bottom of
  `system/controlDict`:
 
 ```c+
@@ -249,7 +249,7 @@ runApplication solids4Foam
 
 According to the analytical solutions given above, the magnitude of the velocity
  and pressure decrease in time, resulting the decay of the vortex. An animation
- of the velocity magnitude from $$t = 0$$ s to $$t = 0.4$$ s is shown in Video 1.
+ of the velocity magnitude from $t = 0$ s to $t = 0.4$ s is shown in Video 1.
  The velocity streamlines, shown in black, are seen to remain stationary as the
  direction of the velocity field remains unchanged in time; instead, only its
  magnitude decreases.
@@ -286,8 +286,8 @@ End
 
 Re-running the case for different mesh densities allows the order of accuracy of
  the solver to be assessed. Below the errors are given for five mesh spacings,
- where a spacing of $$0.05$$ m corresponds to the $$20 \times 20$$ grid described
- above ($$1$$ m divided into $$20$$ gives $$0.05$$ m).
+ where a spacing of $0.05$ m corresponds to the $20 \times 20$ grid described
+ above ($1$ m divided into $20$ gives $0.05$ m).
 
 ```text
 # dx L1 L2 LInf
@@ -299,8 +299,8 @@ Re-running the case for different mesh densities allows the order of accuracy of
 ```
 
 Plotting these errors on a log-log plot demonstrates that second-order is
- achieved as expected (Figure 2), where the $$L_\infty$$ (maximum) errors are
- larger than the $$L_1$$ and $$L_2$$ (average) errors, which is also as
+ achieved as expected (Figure 2), where the $L_\infty$ (maximum) errors are
+ larger than the $L_1$ and $L_2$ (average) errors, which is also as
  expected.
 
 ![Taylor-Green vortex errors vs mesh spacing](images/taylorGreenVortexErrors.png)
