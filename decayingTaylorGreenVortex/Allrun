@@ -95,7 +95,7 @@ do
         # Create the mesh
         solids4Foam::runApplication blockMesh
 
-        # Initialie the velocity and pressure initial fields with the analytical
+        # Initialise the velocity and pressure initial fields with the analytical
         # solutions
         solids4Foam::runApplication initialiseTaylorGreenVortex
 

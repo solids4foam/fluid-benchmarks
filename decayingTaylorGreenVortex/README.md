@@ -237,7 +237,7 @@ restore0Dir
 # Create the mesh
 runApplication blockMesh
 
-# Initialie the velocity and pressure initial fields with the analytical
+# Initialise the velocity and pressure initial fields with the analytical
 # solutions
 runApplication initialiseTaylorGreenVortex
 
