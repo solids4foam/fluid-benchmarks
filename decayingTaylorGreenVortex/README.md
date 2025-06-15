@@ -11,11 +11,11 @@
 ## Case Overview
 
 The 2-D, transient Taylor–Green decaying vortex flow has an analytical solution
- for an incompressible laminar, viscous fluid [1]. Consequently, the case is
- well-suited for benchmarking the accuracy and order of accuracy (spatial and
- temporal) of a discretisation. The spatial domain is taken here as the unit
- square $[0, 1] \times [0, 1]$ m and the analytical solution in
- non-dimensional form is given by
+for an incompressible laminar, viscous fluid [^erzincanli2013]. Consequently,
+the case is well-suited for benchmarking the accuracy and order of accuracy
+(spatial and temporal) of a discretisation. The spatial domain is taken here as
+the unit square $[0, 1] \times [0, 1]$ m and the analytical solution in
+non-dimensional form is given by
 
 $$
 u(x, y, t) = e^{-2\pi^2 t/\text{Re}} \sin(\pi x) \cos(\pi y) \\
@@ -309,6 +309,7 @@ Plotting these errors on a log-log plot demonstrates that second-order is
 
 ## References
 
-[1] [Erzincanli, B. and Sahin, M. (2013). An arbitrary Lagrangian–Eulerian
- formulation for solving moving boundary problems with large displacement and
- rotations, Journal of Computational Physics 255 (2013) 660–679](https://doi.org/10.1016/j.jcp.2013.08.038)
+[^erzincanli2013]: [Erzincanli, B. and Sahin, M. (2013). An arbitrary
+    Lagrangian–Eulerian formulation for solving moving boundary problems with
+    large displacement and rotations, Journal of Computational Physics 255
+    (2013) 660–679](https://doi.org/10.1016/j.jcp.2013.08.038)
