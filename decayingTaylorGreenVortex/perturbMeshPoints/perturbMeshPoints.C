@@ -54,9 +54,7 @@ Author
 #include "Random.H"
 #include "twoDPointCorrector.H"
 #include "unitConversion.H"
-#ifdef OPENFOAM_NOT_EXTEND
-    #include "primitiveMeshTools.H"
-#endif
+#include "primitiveMeshTools.H"
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -65,7 +63,6 @@ using namespace Foam;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#ifdef OPENFOAM_COM
 
 // Copied from Foam::polyDualMesh in OpenFOAM-v2312
 void calcFeatures
@@ -202,13 +199,10 @@ void calcFeatures
     featureEdges.transfer(allFeatureEdges);
 }
 
-#endif // OPENFOAM_COM
-
 
 // Modified form OpenFOAM-v2312 primitiveMeshCheck.C
 label numSevereNonOrthoFaces(const fvMesh& mesh)
 {
-#ifdef OPENFOAM_NOT_EXTEND
     // Calculate the mesh orthogonality
     tmp<scalarField> tortho = primitiveMeshTools::faceOrthogonality
     (
@@ -234,10 +228,6 @@ label numSevereNonOrthoFaces(const fvMesh& mesh)
     }
 
     return severeNonOrth;
-#else
-    // Checks not performed for foam extend
-    return 0;
-#endif
 }
 
 
@@ -272,10 +262,8 @@ int main(int argc, char *argv[])
     const scalar beta(perturbDict.lookupOrDefault("beta", 0.8));
     const int maxIter(perturbDict.lookupOrDefault("maxIter", 1000));
     const scalar minCellVol(perturbDict.lookupOrDefault("minCellVol", 0.1));
-#ifdef OPENFOAM_COM
     const scalar minCos(readScalar(perturbDict.lookup("minCos")));
     const Switch Gaussian(perturbDict.lookup("Gaussian"));
-#endif
 
     // Convert fixedPatches list to a set
     HashSet<word> fixedPatches;
@@ -342,7 +330,6 @@ int main(int argc, char *argv[])
         }
     }
 
-#ifdef OPENFOAM_COM
     // Mark all feature points as fixed
     {
         // Calculate feature points and edges
@@ -363,7 +350,6 @@ int main(int argc, char *argv[])
             fixedPoint[curEdge.end()] = true;
         }
     }
-#endif // OPENFOAM_COM
 
     // Perform loop
     //     1. Apply mesh motion based on the scaled local minimum edge length
@@ -388,7 +374,6 @@ int main(int argc, char *argv[])
         {
             if (!fixedPoint[pointI])
             {
-    #ifdef OPENFOAM_COM
                 if (Gaussian)
                 {
                     // Gaussian distribution
@@ -402,22 +387,15 @@ int main(int argc, char *argv[])
                         );
                 }
                 else
-    #endif
                 {
                     // Uniform distribution
                     newPoints[pointI] +=
                         minEdgeLength[pointI]
                        *vector
                         (
-    #ifdef FOAMEXTEND
-                            scaleFactor.x()*(2.0*rnd.scalar01() - 1.0),
-                            scaleFactor.y()*(2.0*rnd.scalar01() - 1.0),
-                            scaleFactor.z()*(2.0*rnd.scalar01() - 1.0)
-    #else
                             scaleFactor.x()*(2.0*rnd.sample01<scalar>() - 1.0),
                             scaleFactor.y()*(2.0*rnd.sample01<scalar>() - 1.0),
                             scaleFactor.z()*(2.0*rnd.sample01<scalar>() - 1.0)
-    #endif
                         );
                 }
             }
@@ -592,12 +570,7 @@ int main(int argc, char *argv[])
                     Info<< "Resetting the random number generator seed" << endl;
 
                     // Change the seed for the random number generator
-#ifdef OPENFOAM_COM
                     rnd.reset(seed + 1);
-#else
-                    rndPtr.clear();
-                    rndPtr.set(new Random(seed + 1));
-#endif
 
                     // Reset minEdgeLength
                     minEdgeLength = oldMinEdgeLength;
