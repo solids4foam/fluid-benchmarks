@@ -260,7 +260,7 @@ According to the analytical solutions given above, the magnitude of the velocity
 The function object described above prints out the velocity field error norms at
  the end of the run after the last time step finished:
 
-```bash
+```console
 ...
 
 Time = 0.4
