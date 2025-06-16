@@ -12,27 +12,15 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
-    object      fluidProperties;
+    location    "system";
+    object      smoothlyDistortMeshPointsDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-fluidModel newtonIcoFluid;
+A    (0.02 0.03 0);
+B    (6 3 0);
+C    (4 5 0);
 
-newtonIcoFluidCoeffs
-{
-    // Trottenberg gives 1/16 for Stokes flow
-    //omega     [0 -2 1 0 0 0 0] 0.0625;
-    omega     [0 -2 1 0 0 0 0] 0.625;
-    localReRef 1;
-    omegaExponent 1.0;
-    alphaU    1.0;
-
-    // Set the pressure to zero at the centre cell
-    pRefPoint (0.5 0.5 0);
-    pRefValue 0.0;
-
-    // PETSc options file used by PETSc SNES
-    optionsFile petscOptions.lu;
-}
+fixedPatches (walls);
 
 // ************************************************************************* //
