@@ -11,11 +11,11 @@
 ## Case Overview
 
 The 2-D, transient Taylor–Green decaying vortex flow has an analytical solution
-for an incompressible laminar, viscous fluid [^erzincanli2013]. Consequently,
-the case is well-suited for benchmarking the accuracy and order of accuracy
-(spatial and temporal) of a discretisation. The spatial domain is taken here as
-the unit square $[0, 1] \times [0, 1]$ m and the analytical solution in
-non-dimensional form is given by
+ for an incompressible laminar, viscous fluid [^erzincanli2013]. Consequently,
+ the case is well-suited for benchmarking the accuracy and order of accuracy
+ (spatial and temporal) of a discretisation. The spatial domain is taken here as
+ the unit square $[0, 1] \times [0, 1]$ m and the analytical solution in
+ non-dimensional form is given by
 
 $$
 u(x, y, t) = e^{-2\pi^2 t/\text{Re}} \sin(\pi x) \cos(\pi y) \\
@@ -223,9 +223,9 @@ The `petscOptions.lu` file currently specifies a Jacobian-free Newton-Krylov
 ## Running the Case
 
 The tutorial case is located at
-`solids4foam/tutorials/fluids/decayingTaylorGreenVortex`. The case can be
-run using the included `Allrun` script, i.e. `./Allrun`. The `Allrun` script
-first performs five steps, as described below:
+ `solids4foam/tutorials/fluids/decayingTaylorGreenVortex`. The case can be
+ run using the included `Allrun` script, i.e. `./Allrun`. The `Allrun` script
+ first performs five steps, as described below:
 
 ```bash
 # Build the utility for initialising the solution
