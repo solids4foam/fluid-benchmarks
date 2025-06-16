@@ -114,6 +114,9 @@ functions
             const auto& U = mesh().lookupObject<volVectorField>("U");
 
             // Calculate the error
+            const volScalarField magError("magError", mag(U - exactU));
+            Info<< "Writing magError to " << time().timeName() << endl;
+            magError.write();
             const scalarField& Vol = mesh().V().field();
             const scalar totalVol = gSum(Vol);
             const vectorField diff(U - exactU);

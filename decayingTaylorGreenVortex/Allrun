@@ -7,12 +7,14 @@ source solids4FoamScripts.sh
 # Build the meshmotion library
 wmake -s libso decayingTaylorGreenVortexMeshMotion
 
-# Build the solution initialisation utility
+# Build helper utilities
 wmake -s initialiseTaylorGreenVortex
+wmake -s perturbMeshPoints
+wmake -s smoothlyDistortMeshPoints
 
 # Define configurations as space-separated strings
 configs=(
-    "BASE=base NAME=hex.lu MOVING_MESH=1 PIMPLEFOAM=1 PETSC_FILE=petscOptions.lu"
+    "BASE=base NAME=hex.lu MOVING_MESH=0 SMOOTHLYDISTORTMESH=1 PERTURBMESH=0 PIMPLEFOAM=1 PETSC_FILE=petscOptions.lu"
 )
 
 # Define start and end mesh indices
@@ -68,6 +70,16 @@ do
         cp -r "../${BASE}" "${CASE}"
         cd "$CASE"
 
+        # Copy the dynamicCode directory to avoid re-building it each time
+        if [ ! -d dynamicCode ]
+        then
+            if [ "$i" -gt 1 ]
+            then
+                echo "Copying ../${NAME}.1/dynamicCode to $CASE"
+                cp -r ../${NAME}.1/dynamicCode .
+            fi
+        fi
+
         # Set the dynamicMeshDict
         if [ "$MOVING_MESH" -eq 1 ]
         then
@@ -94,6 +106,18 @@ do
 
         # Create the mesh
         solids4Foam::runApplication blockMesh
+
+        # Optional mesh distortion
+        if [ "$SMOOTHLYDISTORTMESH" -eq 1 ]
+        then
+            solids4Foam::runApplication smoothlyDistortMeshPoints
+        fi
+
+        # Optional mesh distortion
+        if [ "$PERTURBMESH" -eq 1 ]
+        then
+            solids4Foam::runApplication perturbMeshPoints
+        fi
 
         # Initialie the velocity and pressure initial fields with the analytical
         # solutions
