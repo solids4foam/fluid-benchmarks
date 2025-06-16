@@ -18,7 +18,7 @@ configs=(
 )
 
 # Define start and end mesh indices
-# Mesh input files are defined from 1 to 5
+# Mesh input files are defined from 1 to 6
 # END_MESH should be greater than START_MESH
 START_MESH=1
 END_MESH=5
