@@ -80,7 +80,7 @@ A utility called `initialiseTaylorGreenVortex` is provided in the case, which
 A structured $20 \times 20$ quadrilateral mesh is employed constructed with
  `blockMesh`; however, the case contains `blockMeshDict` files with coarser and
  finer resolutions to allow a mesh sensitivity study to be easily performed,
- e.g. ```cp system/blockMeshDict.4 system/blockMeshDict && blockMesh`.
+ e.g. `cp system/blockMeshDict.4 system/blockMeshDict && blockMesh`.
 
 The case contains a function object, which calculates the exact velocity field
  `exactU` and the error norm in the velocity field ($L_1$, $L_2$, and
