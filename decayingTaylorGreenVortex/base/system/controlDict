@@ -17,7 +17,11 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-libs            ("libdecayingTaylorGreenVortexMeshMotion.so");
+libs
+(
+    "libdecayingTaylorGreenVortexMeshMotion.so"
+    "libdecayingTaylorGreenVortexFvPatchVectorField.so"
+);
 
 application     solids4Foam;
 
