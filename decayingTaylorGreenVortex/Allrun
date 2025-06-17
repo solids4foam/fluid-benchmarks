@@ -61,7 +61,7 @@ do
     echo "# Mesh Time Mem U_L1 U_L2 U_Linf" > "${SUMMARY}"
 
     # Loop over mesh densities in each configuration
-    for i in `seq $START_MESH $END_MESH`
+    for i in $(seq $START_MESH $END_MESH)
     do
         CASE="${NAME}.$i"
         echo; echo "Processing case: $CASE"
