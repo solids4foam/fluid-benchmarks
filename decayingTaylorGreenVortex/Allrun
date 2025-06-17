@@ -120,8 +120,8 @@ do
             solids4Foam::runApplication perturbMeshPoints
         fi
 
-        # Initialie the velocity and pressure initial fields with the analytical
-        # solutions
+        # Initialise the velocity and pressure initial fields with the
+        # analytical solutions
         solids4Foam::runApplication initialiseTaylorGreenVortex
 
         # Set the solver
