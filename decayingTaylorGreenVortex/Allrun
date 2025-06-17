@@ -38,7 +38,6 @@ else
     CPU_TYPE="Unknown_CPU"
 fi
 
-
 # Create timestamped working directory for this run
 DATE=$(date +%Y%m%d_%H%M%S)
 RUN_DIR="run_${CPU_TYPE}_${DATE}"
