@@ -221,5 +221,5 @@ cd ..
 
 echo; echo; echo "Done!"; echo
 echo "View the PDF files in ${RUN_DIR}"
-echo; echo $(date)
+echo; date
 echo; echo
