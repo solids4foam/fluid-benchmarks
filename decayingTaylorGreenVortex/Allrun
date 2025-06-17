@@ -157,7 +157,7 @@ do
         elif command -v time &> /dev/null
         then
             echo "Running $SOLVER on ${CASE} with time"
-            gtime -f "Maximum resident set size (kbytes): %M" $SOLVER &> $LOG
+            time -f "Maximum resident set size (kbytes): %M" $SOLVER &> $LOG
         else
             echo "Running $SOLVER on ${CASE}"
             $SOLVER &> $LOG
