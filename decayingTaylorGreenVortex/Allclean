@@ -1,0 +1,13 @@
+#!/bin/bash
+cd "${0%/*}" || exit    # Run from this directory
+
+# Clean the meshmotion library
+wclean -s decayingTaylorGreenVortexMeshMotion
+
+# Clean helper utilities
+wclean -s initialiseTaylorGreenVortex
+wclean -s perturbMeshPoints
+wclean -s smoothlyDistortMeshPoints
+
+echo; echo "Removing all run directories"
+find . -maxdepth 1 -name 'run_*' -type d -print0 | xargs --null rm -rf

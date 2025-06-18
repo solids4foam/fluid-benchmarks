@@ -1,4 +1,5 @@
 #!/bin/bash
+cd "${0%/*}" || exit    # Run from this directory
 
 # Source required functions
 . $WM_PROJECT_DIR/bin/tools/RunFunctions
@@ -37,10 +38,9 @@ else
     CPU_TYPE="Unknown_CPU"
 fi
 
-
 # Create timestamped working directory for this run
-DATE=$(date +%Y%m%d_%H%M%S)
-RUN_DIR="run_${CPU_TYPE}_${DATE}"
+DATE_TIME=$(date +%Y%m%d_%H%M%S)
+RUN_DIR="run_${CPU_TYPE}_${DATE_TIME}"
 echo "Creating ${RUN_DIR}"
 mkdir "${RUN_DIR}"
 
@@ -61,7 +61,7 @@ do
     echo "# Mesh Time Mem U_L1 U_L2 U_Linf" > "${SUMMARY}"
 
     # Loop over mesh densities in each configuration
-    for i in `seq $START_MESH $END_MESH`
+    for i in $(seq $START_MESH $END_MESH)
     do
         CASE="${NAME}.$i"
         echo; echo "Processing case: $CASE"
@@ -119,8 +119,8 @@ do
             solids4Foam::runApplication perturbMeshPoints
         fi
 
-        # Initialie the velocity and pressure initial fields with the analytical
-        # solutions
+        # Initialise the velocity and pressure initial fields with the
+        # analytical solutions
         solids4Foam::runApplication initialiseTaylorGreenVortex
 
         # Set the solver
@@ -157,7 +157,7 @@ do
         elif command -v time &> /dev/null
         then
             echo "Running $SOLVER on ${CASE} with time"
-            gtime -f "Maximum resident set size (kbytes): %M" $SOLVER &> $LOG
+            time -f "Maximum resident set size (kbytes): %M" $SOLVER &> $LOG
         else
             echo "Running $SOLVER on ${CASE}"
             $SOLVER &> $LOG
@@ -221,5 +221,5 @@ cd ..
 
 echo; echo; echo "Done!"; echo
 echo "View the PDF files in ${RUN_DIR}"
-echo; echo $(date)
+echo; date
 echo; echo
