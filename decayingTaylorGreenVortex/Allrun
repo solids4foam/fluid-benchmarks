@@ -35,10 +35,10 @@ configs=(
 )
 
 # Define start and end mesh indices
-# Mesh input files are defined from 1 to 6
+# Mesh input files are defined from 1 to 7
 # END_MESH should be greater than START_MESH
 START_MESH=1
-END_MESH=3
+END_MESH=5
 
 # Detect the CPU type: we append this to the case name
 if [[ "$OSTYPE" == "darwin"* ]]
