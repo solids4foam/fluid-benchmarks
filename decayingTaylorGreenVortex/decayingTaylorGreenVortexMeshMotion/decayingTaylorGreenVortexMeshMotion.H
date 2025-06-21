@@ -44,7 +44,6 @@ SourceFiles
 
 Author
     Philip Cardiff, UCD.
-    Chanikya Valeti, UCD.
 
 \*---------------------------------------------------------------------------*/
 
@@ -76,6 +75,9 @@ class decayingTaylorGreenVortexMeshMotion
 
         //- Motion scale factor
         const scalar A_;
+
+        //- Flag to indicate orthogonal mesh motion or more general motion
+        const Switch orthogonalMeshMotion_;
 
 
     // Private Member Functions

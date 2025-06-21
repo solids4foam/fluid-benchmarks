@@ -16,17 +16,21 @@ wmake -s smoothlyDistortMeshPoints
 # Define configurations as space-separated strings
 # BASE:            name of the base template case
 # NAME:            base name given to each case that is created
-# MOVING:          moving or static mesh
 # GRADED:          graded or uniform initial mesh
+# MOVING:          moving or static mesh
+# ORTHOGONAL:      orthogonal or general prescribed mesh motion (if MOVING is
+#                  enabled)
 # SMOOTHLYDISTORT: apply a smooth distortion to the initial mesh using
 #                  smoothlyDistortMeshPoints
-# BUMP:            bump or sinusoidal version of smoothlyDistortMeshPoints
+# BUMP:            bump or sinusoidal version of smoothlyDistortMeshPoints (if
+#                  SMOOTHLYDISTORT is enabled)
 # PERTURB:         apply a random perturbtation to the initial mesh using
 #                  perturbMeshPoints
 # PIMPLEFOAM:      use the pimpleFoam or solids4Foam solver
 configs=(
-    "BASE=base NAME=hex.lu MOVING=0 GRADED=1 \
-    SMOOTHLYDISTORT=1 PERTURB=0 BUMP=1 \
+    "BASE=base NAME=hex.lu GRADED=1 \
+    MOVING=0 ORTHOGONAL=1 \
+    SMOOTHLYDISTORT=0 PERTURB=0 BUMP=1 \
     PIMPLEFOAM=1"
 )
 
@@ -95,8 +99,18 @@ do
         # Set the dynamicMeshDict
         if [ "$MOVING" -eq 1 ]
         then
-            echo "Copying constant/dynamicMeshDict.moving to constant/dynamicMeshDict"
-            \cp constant/dynamicMeshDict.moving constant/dynamicMeshDict
+            if [ "$ORTHOGONAL" -eq 1 ]
+            then
+                echo "Copying constant/dynamicMeshDict.orthogonal.moving to \
+                      constant/dynamicMeshDict"
+                \cp constant/dynamicMeshDict.orthogonal.moving \
+                    constant/dynamicMeshDict
+            else
+                echo "Copying constant/dynamicMeshDict.general.moving to \
+                      constant/dynamicMeshDict"
+                \cp constant/dynamicMeshDict.general.moving \
+                    constant/dynamicMeshDict
+            fi
         else
             echo "Copying constant/dynamicMeshDict.static to constant/dynamicMeshDict"
             \cp constant/dynamicMeshDict.static constant/dynamicMeshDict

@@ -80,6 +80,13 @@ Foam::decayingTaylorGreenVortexMeshMotion::decayingTaylorGreenVortexMeshMotion
                 "decayingTaylorGreenVortexMeshMotionCoeffs"
             ).lookup("scaleFactor")
         )
+    ),
+    orthogonalMeshMotion_
+    (
+        dict.subDict
+        (
+            "decayingTaylorGreenVortexMeshMotionCoeffs"
+        ).lookup("orthogonalMeshMotion")
     )
 {}
 
@@ -103,6 +110,13 @@ Foam::decayingTaylorGreenVortexMeshMotion::decayingTaylorGreenVortexMeshMotion
                 "decayingTaylorGreenVortexMeshMotionCoeffs"
             ).lookup("scaleFactor")
         )
+    ),
+    orthogonalMeshMotion_
+    (
+        dict.subDict
+        (
+            "decayingTaylorGreenVortexMeshMotionCoeffs"
+        ).lookup("orthogonalMeshMotion")
     )
 {}
 
@@ -146,28 +160,20 @@ void Foam::decayingTaylorGreenVortexMeshMotion::solve()
     const scalar t = time().value();
 
     // Calculate the displacement
-    pointDisplacement_.primitiveFieldRef() =
-        A_*Foam::sin(pi*t/0.8)*Foam::sin(pi*x)*Foam::sin(pi*y)*vector(1, 1, 0);
+    if (orthogonalMeshMotion_)
+    {
+        const scalar timeFactor = A_*Foam::sin(pi*t/0.8);
 
-    // Set displacements near the boundary to zero for testing
-    // forAll(x, pointI)
-    // {
-    //     if
-    //     (
-    //         x[pointI] < 0.2 || x[pointI] > 0.8
-    //      || y[pointI] < 0.2 || y[pointI] > 0.8
-    //     )
-    //     {
-    //         pointDisplacement_.primitiveFieldRef()[pointI] = vector::zero;
-    //     }
-    //     else
-    //     {
-    //         const scalar X = (x[pointI] - 0.2)/0.6;
-    //         const scalar Y = (y[pointI] - 0.2)/0.6;
-    //         pointDisplacement_.primitiveFieldRef()[pointI] =
-    //             A_*Foam::sin(pi*t/0.8)*Foam::sin(pi*X)*Foam::sin(pi*Y)*vector(1, 1, 0);
-    //     }
-    // }
+        pointDisplacement_.primitiveFieldRef() =
+            timeFactor*Foam::sin(pi*x)*vector(1, 0, 0)
+          + timeFactor*Foam::sin(pi*y)*vector(0, 1, 0);
+    }
+    else
+    {
+        pointDisplacement_.primitiveFieldRef() =
+            A_*Foam::sin(pi*t/0.8)*Foam::sin(pi*x)
+           *Foam::sin(pi*y)*vector(1, 1, 0);
+    }
 
     pointDisplacement_.correctBoundaryConditions();
 }
