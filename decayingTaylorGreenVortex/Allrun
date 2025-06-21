@@ -14,15 +14,25 @@ wmake -s perturbMeshPoints
 wmake -s smoothlyDistortMeshPoints
 
 # Define configurations as space-separated strings
+# BASE:            name of the base template case
+# NAME:            base name given to each case that is created
+# MOVING:          moving or static mesh
+# GRADED:          graded or uniform initial mesh
+# SMOOTHLYDISTORT: apply a smooth distortion to the initial mesh using
+#                  smoothlyDistortMeshPoints
+# PERTURB:         apply a random perturbtation to the initial mesh using
+#                  perturbMeshPoints
+# PIMPLEFOAM:      use the pimpleFoam or solids4Foam solver
 configs=(
-    "BASE=base NAME=hex.lu MOVING_MESH=0 SMOOTHLYDISTORTMESH=1 PERTURBMESH=0 PIMPLEFOAM=1 PETSC_FILE=petscOptions.lu"
+    "BASE=base NAME=hex.lu MOVING=0 GRADED=1 SMOOTHLYDISTORT=1 PERTURB=0 \
+    PIMPLEFOAM=1"
 )
 
 # Define start and end mesh indices
 # Mesh input files are defined from 1 to 6
 # END_MESH should be greater than START_MESH
 START_MESH=1
-END_MESH=5
+END_MESH=3
 
 # Detect the CPU type: we append this to the case name
 if [[ "$OSTYPE" == "darwin"* ]]
@@ -81,7 +91,7 @@ do
         fi
 
         # Set the dynamicMeshDict
-        if [ "$MOVING_MESH" -eq 1 ]
+        if [ "$MOVING" -eq 1 ]
         then
             echo "Copying constant/dynamicMeshDict.moving to constant/dynamicMeshDict"
             \cp constant/dynamicMeshDict.moving constant/dynamicMeshDict
@@ -90,31 +100,35 @@ do
             \cp constant/dynamicMeshDict.static constant/dynamicMeshDict
         fi
 
-        # Replace the blockMeshDict
-        if [[ ! -f "system/blockMeshDict.$i" ]]
+        # Set the blockMeshDict
+        BLOCKMESHDICT="system/blockMeshDict.uniform.$i"
+        if [ "$GRADED" -eq 1 ]
         then
-            echo "Cannot find ${CASE}/system/blockMeshDict.$i: please add it to ${BASE}/meshes/"; echo
+            BLOCKMESHDICT="system/blockMeshDict.graded.$i"
+        fi
+        echo "Using ${BLOCKMESHDICT}"
+
+        if [[ ! -f "${BLOCKMESHDICT}" ]]
+        then
+            echo "Cannot find ${CASE}/${BLOCKMESHDICT}: please add it to ${BASE}/system/"
+            echo
             exit 1;
-        else
-            echo "Copying ${CASE}/system/blockMeshDict.$i to ${CASE}/system/blockMeshDict"
-            \cp "system/blockMeshDict.$i" system/blockMeshDict
-            rm -f constant/polyMesh/blockMeshDict
         fi
 
         # Copy 0.orig to 0
         cp -r 0.orig 0
 
         # Create the mesh
-        solids4Foam::runApplication blockMesh
+        solids4Foam::runApplication blockMesh -dict "${BLOCKMESHDICT}"
 
         # Optional mesh distortion
-        if [ "$SMOOTHLYDISTORTMESH" -eq 1 ]
+        if [ "$SMOOTHLYDISTORT" -eq 1 ]
         then
             solids4Foam::runApplication smoothlyDistortMeshPoints
         fi
 
         # Optional mesh distortion
-        if [ "$PERTURBMESH" -eq 1 ]
+        if [ "$PERTURB" -eq 1 ]
         then
             solids4Foam::runApplication perturbMeshPoints
         fi
@@ -136,11 +150,6 @@ do
             \cp system/fvSchemes.pimpleFoam system/fvSchemes
 
             SOLVER="pimpleFoam"
-        fi
-
-        # Update the PETSc options file
-        if [ -n "${PETSC_FILE}" ]; then
-            sed -i "/^\s*optionsFile /s|^.*|    optionsFile ${PETSC_FILE};|" constant/fluidProperties
         fi
 
         # Set the log file name

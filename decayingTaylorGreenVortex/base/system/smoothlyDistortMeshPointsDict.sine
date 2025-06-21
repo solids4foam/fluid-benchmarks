@@ -18,16 +18,16 @@ FoamFile
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 // Sine function
-// A    (0.02 0.03 0);
-// B    (6 3 0);
-// C    (4 5 0);
+A    (0.02 0.03 0);
+B    (6 3 0);
+C    (4 5 0);
 
 // Bump function
-A    (20 30 0);
-B    (2 4 0);
-C    (2 2 0);
+// A    (20 30 0);
+// B    (2 4 0);
+// C    (2 2 0);
 
-useBumpFunction yes;
+useBumpFunction no;
 
 fixedPatches (walls);
 

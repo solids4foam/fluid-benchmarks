@@ -66,7 +66,7 @@ For pressure, a zero gradient condition is assumed:
  $\boldsymbol{n} \cdot \boldsymbol{\nabla} p = 0$;
  consequently, the pressure field is defined up to a constant. To deal with
  this in the current case, the pressure in the cell closest to the centre of
- the domain is fixed to 0.
+ the domain is fixed to 0, although any cell could be chosen.
 
 A utility called `initialiseTaylorGreenVortex` is provided in the case, which
  initialises the internal velocity and pressure fields to the analytical
@@ -77,10 +77,54 @@ A utility called `initialiseTaylorGreenVortex` is provided in the case, which
 
 **Figure 1: The velocity magnitude field at the initial time.**
 
-A structured $20 \times 20$ quadrilateral mesh is employed constructed with
- `blockMesh`; however, the case contains `blockMeshDict` files with coarser and
- finer resolutions to allow a mesh sensitivity study to be easily performed,
- e.g. `cp system/blockMeshDict.4 system/blockMeshDict && blockMesh`.
+The case is examined using both static and moving meshes. Four variants of
+ static mesh are consdered:
+
+- **Static 1**: an orthogonal mesh, consisting of $N \times N$ quadrilateral
+  cells constructed using `blockMesh`.
+- **Static 2**: starts with the mesh from variant 1 and applies a smooth
+  distortion to the internal mesh points using a *bump* function. In the limit
+  of mesh refinement, the local face non-orthogonality goes to zero; that is,
+  the mesh becomes effectively orthogonal for fine meshes.
+- **Static 3**: starts with the mesh from variant 1 and applies smooth distort
+  internally *and* at the boundary using a sinuisoidal function. Like variant 2,
+  the internal mesh faces become orthogonal in the limit of mesh refinement;
+  however, unlike variant 2, finite non-orthogonality remains at the boundary
+  faces even in the limit of mesh refinement. In this way, this variant assesses
+  whether the discretisation consistently deals with boundary non-orthogonality.
+- **Static 4**: starts with the mesh from variant 1 and applies a random
+  perturbation to each internal mesh point. This perturbation is applied
+  independently to each mesh level. Unlike previous variants, face
+  non-orthogonality remains finite internally and at the boundary in this
+  variant. As such, this variant is the most challenge static mesh from the
+  discretisation perspective. Assessing the order of accuracy on these types of
+  grids may require multiple simulations at each grid level using different
+  random perturbation parameters; a best fit approach can then be used to
+  determine the order of accuracy from the error vs average mesh spacing plots.
+
+In addition to the static mesh variants, four moving mesh variants are considered:
+
+- **Moving 1**: starting with the mesh from Static 1, a time-varying mesh motion
+  is prescribed. The mesh is moved such that all mesh faces remain orthogonal.
+  This allows the effect of mesh motion to be assessed independently of mesh
+  non-orthogonality and skewness.
+- **Moving 2**: the smooth mesh distortion from variant 2 is applied as a
+  time-varying mesh motion. Like variant 2, internal and boundary face
+  non-orthogonality go to zero in the limit of mesh refinement.
+- **Moving 3**: the smooth mesh distortion of variant 3 is applied as a
+  time-varying mesh motion. Like variant 3, internal face non-orthogonality go to
+  zero in the limit of mesh refinement but boundary face non-orthogonality
+  remains finite.
+
+The base case contains multiple `blockMeshDict` files of increasing mesh
+ density, which can be selected with the `-dict` option, e.g.
+ `blockMesh -dict system/blockMeshDict.uniform.3`. The `system/blockMeshDict.uniform.1`
+ dictionary defines a mesh with $5 \times 5$ cells, and the number of cells in
+ each direction is double for subsequent grids, e.g., `system/blockMeshDict.uniform.2`
+ contains $10 \times 10$ cells. The `*.graded.*` versions of the `blockMeshDict`
+ dictionaries (e.g., `system/blockMeshDict.graded.2`) contain the same number of
+ cells as the `*.uniform.*` versions, but apply mesh grading towards the walls,
+ i.e. the cells are smaller near the walls and larger near the domain centre.
 
 The case contains a function object, which calculates the exact velocity field
  `exactU` and the error norm in the velocity field ($L_1$, $L_2$, and
