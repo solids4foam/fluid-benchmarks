@@ -20,11 +20,13 @@ wmake -s smoothlyDistortMeshPoints
 # GRADED:          graded or uniform initial mesh
 # SMOOTHLYDISTORT: apply a smooth distortion to the initial mesh using
 #                  smoothlyDistortMeshPoints
+# BUMP:            bump or sinusoidal version of smoothlyDistortMeshPoints
 # PERTURB:         apply a random perturbtation to the initial mesh using
 #                  perturbMeshPoints
 # PIMPLEFOAM:      use the pimpleFoam or solids4Foam solver
 configs=(
-    "BASE=base NAME=hex.lu MOVING=0 GRADED=1 SMOOTHLYDISTORT=1 PERTURB=0 \
+    "BASE=base NAME=hex.lu MOVING=0 GRADED=1 \
+    SMOOTHLYDISTORT=1 PERTURB=0 BUMP=1 \
     PIMPLEFOAM=1"
 )
 
@@ -124,6 +126,19 @@ do
         # Optional mesh distortion
         if [ "$SMOOTHLYDISTORT" -eq 1 ]
         then
+            if [ "$BUMP" -eq 1 ]
+            then
+                echo "Copying system/smoothlyDistortMeshPointsDict.bump to \
+                      system/smoothlyDistortMeshPointsDict"
+                \cp system/smoothlyDistortMeshPointsDict.bump \
+                    system/smoothlyDistortMeshPointsDict
+            else
+                echo "Copying system/smoothlyDistortMeshPointsDict.sine to \
+                      system/smoothlyDistortMeshPointsDict"
+                \cp system/smoothlyDistortMeshPointsDict.sine \
+                    system/smoothlyDistortMeshPointsDict
+            fi
+                
             solids4Foam::runApplication smoothlyDistortMeshPoints
         fi
 
