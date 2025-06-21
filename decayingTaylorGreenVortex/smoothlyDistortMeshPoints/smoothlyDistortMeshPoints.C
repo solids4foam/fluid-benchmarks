@@ -28,6 +28,12 @@ Description
                 Az*sin(Bz*pi*x)*sin(Cz*pi*y)
             )
 
+    or, if "useBumpFunction" is set to true, then
+
+        pointD(x,y) =
+            sqr(x)*Foam::pow(1.0 - x, 2)*sqr(y)*Foam::pow(1.0 - y, 2)
+           *vector(Ax, Ay, Az);
+
     where A[x-z], B[x-z] and C[x-z] are user-provided parameters.
 
     Patches which should not move can be defined via the fixedPatches entry.
@@ -46,7 +52,7 @@ Author
 #include "argList.H"
 #include "twoDPointCorrector.H"
 #include "unitConversion.H"
-
+#include "regionProperties.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -56,11 +62,34 @@ using namespace Foam;
 
 int main(int argc, char *argv[])
 {
+#   include "addAllRegionOptions.H"
 #   include "setRootCase.H"
 #   include "createTime.H"
+#   include "getAllRegionOptions.H"
 #   include "createMesh.H"
 
+
     argList::noParallel();
+
+    const fileName meshDir
+    (
+        polyMesh::meshDir(regionName)
+    );
+
+    // Read the points
+    pointIOField points
+    (
+        IOobject
+        (
+            "points",
+            runTime.findInstance(meshDir, "points"),
+            meshDir,
+            runTime,
+            IOobject::MUST_READ,
+            IOobject::NO_WRITE,
+            IOobject::NO_REGISTER
+        )
+    );
 
     // Read dictionary
     Info<< "Reading smoothlyDistortMeshPointsDict dictionary" << nl << endl;
@@ -80,6 +109,7 @@ int main(int argc, char *argv[])
     const vector A(perturbDict.lookup("A"));
     const vector B(perturbDict.lookup("B"));
     const vector C(perturbDict.lookup("C"));
+    const Switch useBumpFunction(perturbDict.lookup("useBumpFunction"));
     const wordList fixedPatchesList(perturbDict.lookup("fixedPatches"));
 
     // Convert fixedPatches list to a set
@@ -90,7 +120,7 @@ int main(int argc, char *argv[])
     }
 
     // Store original points
-    const pointField oldPoints = mesh.points();
+    const pointField oldPoints(points);
 
     // Calculate a mask to identify fixed points
     boolList fixedPoint(oldPoints.size(), false);
@@ -111,8 +141,6 @@ int main(int argc, char *argv[])
     }
 
     // Calculate new points
-    pointField newPoints(oldPoints);
-
     const scalar Ax = A.x();
     const scalar Ay = A.y();
     const scalar Az = A.z();
@@ -124,20 +152,30 @@ int main(int argc, char *argv[])
     const scalar Cz = C.z();
     const scalar pi = constant::mathematical::pi;
 
-    forAll(newPoints, pointI)
+    forAll(points, pointI)
     {
         if (!fixedPoint[pointI])
         {
             const scalar x = oldPoints[pointI][vector::X];
             const scalar y = oldPoints[pointI][vector::Y];
 
-            newPoints[pointI] +=
-                vector
-                (
-                    Ax*Foam::sin(Bx*pi*x)*Foam::sin(Cx*pi*y),
-                    Ay*Foam::sin(By*pi*x)*Foam::sin(Cy*pi*y),
-                    Az*Foam::sin(Bz*pi*x)*Foam::sin(Cz*pi*y)
-                );
+            if (useBumpFunction)
+            {
+                const scalar bump =
+                    sqr(x)*Foam::pow(1.0 - x, 2)*sqr(y)*Foam::pow(1.0 - y, 2);
+
+                points[pointI] += bump*vector(Ax, Ay, Az);
+            }
+            else
+            {
+                points[pointI] +=
+                    vector
+                    (
+                        Ax*Foam::sin(Bx*pi*x)*Foam::sin(Cx*pi*y),
+                        Ay*Foam::sin(By*pi*x)*Foam::sin(Cy*pi*y),
+                        Az*Foam::sin(Bz*pi*x)*Foam::sin(Cz*pi*y)
+                    );
+            }
         }
     }
 
@@ -153,24 +191,19 @@ int main(int argc, char *argv[])
         {
             const vector& n = pointNormals[pI];
             const label pointID = meshPoints[pI];
-            const vector disp = newPoints[pointID] - oldPoints[pointID];
+            const vector disp = points[pointID] - oldPoints[pointID];
 
-            newPoints[pointID] = oldPoints[pointID] + ((I - sqr(n)) & disp);
+            points[pointID] = oldPoints[pointID] + ((I - sqr(n)) & disp);
         }
     }
 
     // Correct points for 2-D
     twoDPointCorrector twoD(mesh);
-    twoD.correctPoints(newPoints);
-
-    // Move the mesh
-    Info<< "Applying the perturbation to the points" << endl;
-    mesh.movePoints(newPoints);
+    twoD.correctPoints(points);
 
     // Write the mesh
-    Info<< "Writing the mesh" << endl;
-    mesh.setInstance(mesh.polyMesh::instance());
-    mesh.write();
+    Info<< "Writing the points" << endl;
+    points.write();
 
     Info<< nl << "End" << nl << endl;
 
