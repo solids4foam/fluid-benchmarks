@@ -175,7 +175,10 @@ decayingTaylorGreenVortexFvPatchVectorField::snGrad() const
     }
     else
     {
-        // fixedValue snGrad with no correction
+        WarningInFunction
+            << "Non-orthogonal corrections not applied on " << patch().name()
+            << endl;
+
         return (*this - patchInternalField())*patch().deltaCoeffs();
     }
 }
@@ -206,6 +209,10 @@ decayingTaylorGreenVortexFvPatchVectorField::gradientBoundaryCoeffs() const
     }
     else
     {
+        WarningInFunction
+            << "Non-orthogonal corrections not applied on " << patch().name()
+            << endl;
+
         return (patch().deltaCoeffs()*(*this));
     }
 }

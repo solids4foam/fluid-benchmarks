@@ -14,6 +14,12 @@ wmake -s perturbMeshPoints
 wmake -s smoothlyDistortMeshPoints
 
 # Define configurations as space-separated strings
+configs=(
+    "BASE=base NAME=hex.lu GRADED=1 \
+    MOVING=0 ORTHOGONAL=1 \
+    SMOOTHLYDISTORT=1 PERTURB=0 BUMP=0 \
+    PIMPLEFOAM=0"
+)
 # BASE:            name of the base template case
 # NAME:            base name given to each case that is created
 # GRADED:          graded or uniform initial mesh
@@ -27,12 +33,6 @@ wmake -s smoothlyDistortMeshPoints
 # PERTURB:         apply a random perturbtation to the initial mesh using
 #                  perturbMeshPoints
 # PIMPLEFOAM:      use the pimpleFoam or solids4Foam solver
-configs=(
-    "BASE=base NAME=hex.lu GRADED=1 \
-    MOVING=0 ORTHOGONAL=1 \
-    SMOOTHLYDISTORT=0 PERTURB=0 BUMP=1 \
-    PIMPLEFOAM=1"
-)
 
 # Define start and end mesh indices
 # Mesh input files are defined from 1 to 7

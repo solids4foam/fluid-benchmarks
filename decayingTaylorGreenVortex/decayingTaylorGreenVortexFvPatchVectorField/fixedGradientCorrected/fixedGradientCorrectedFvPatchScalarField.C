@@ -246,7 +246,10 @@ void fixedGradientCorrectedFvPatchScalarField::evaluate
     }
     else
     {
-        // No non-orthogonal correction
+        WarningInFunction
+            << "Non-orthogonal corrections not applied on " << patch().name()
+            << endl;
+
         Field<scalar>::operator=
         (
             patchInternalField() + gradient()/patch().deltaCoeffs()
