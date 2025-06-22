@@ -5,20 +5,18 @@ cd "${0%/*}" || exit    # Run from this directory
 . $WM_PROJECT_DIR/bin/tools/RunFunctions
 source solids4FoamScripts.sh
 
-# Build the meshmotion library
-wmake -s libso decayingTaylorGreenVortexMeshMotion
+# Build the helper libraries
+(cd src && ./Allwmake -j -s)
 
 # Build helper utilities
-wmake -s initialiseTaylorGreenVortex
-wmake -s perturbMeshPoints
-wmake -s smoothlyDistortMeshPoints
+wmake -j -s all utilities
 
 # Define configurations as space-separated strings
 configs=(
     "BASE=base NAME=hex.lu GRADED=1 \
-    MOVING=0 ORTHOGONAL=1 \
+    MOVING=0 ORTHOGONAL=0 \
     SMOOTHLYDISTORT=1 PERTURB=0 BUMP=0 \
-    PIMPLEFOAM=0"
+    PIMPLEFOAM=1"
 )
 # BASE:            name of the base template case
 # NAME:            base name given to each case that is created
