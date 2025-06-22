@@ -31,11 +31,13 @@ where $u$ is the non-dimensional $x$ component of velocity, $v$ is the
  and $C$ is an arbitrary constant.
 
 The time-varying analytical solution for velocity is prescribed as a boundary
- condition using the `codedFixedValue` boundary condition as follows:
+ condition using a custom boundary condition called `decayingTaylorGreenVortexVelocity`
+ or a `codedFixedValue` boundary condition as follows:
 
 ```c++
     walls
     {
+        //type            decayingTaylorGreenVortexVelocity;
         type            codedFixedValue;
         name            decayingTaylorGreenVortexVelocity;
 
@@ -62,11 +64,28 @@ The time-varying analytical solution for velocity is prescribed as a boundary
     }
 ```
 
+```note
+The difference between the `decayingTaylorGreenVortexVelocity` condition and the
+ `codedFixedValue` condition is that `decayingTaylorGreenVortexVelocity` applies
+ non-orthogonal corrections at the boundary faces. Without these non-orthogonal
+ corrections, the solution will approach zero-order order of accuracy for grids
+ which contain finite boundary non-orthogonality in the limit of mesh
+ refinement.
+ ```
+
 For pressure, a zero gradient condition is assumed:
- $\boldsymbol{n} \cdot \boldsymbol{\nabla} p = 0$;
- consequently, the pressure field is defined up to a constant. To deal with
- this in the current case, the pressure in the cell closest to the centre of
- the domain is fixed to 0, although any cell could be chosen.
+ $\boldsymbol{n} \cdot \boldsymbol{\nabla} p = 0$. This condition is enforced
+ through a custom condition called `fixedGradientCorrected` or the standard
+ `zeroGradient` boundary condition. The `fixedGradientCorrected` condition
+ applies boudnary non-orthogonal corrections, whereas `zeroGradient` does not.
+ As noted above for the velocity field, boundary non-orthogonal corrections are
+ required to achieve the theoretical order of accuracy on grids containing
+ boundary non-orthogonality in the limited of mesh refinement.
+
+As all pressure boundaries are of gradient type, the pressure field is defined
+ up to a constant. To deal with this in the current case, the pressure in the
+ cell closest to the centre of the domain is fixed to 0, although any cell
+ could be chosen.
 
 A utility called `initialiseTaylorGreenVortex` is provided in the case, which
  initialises the internal velocity and pressure fields to the analytical
@@ -82,17 +101,17 @@ The case is examined using both static and moving meshes. Four variants of
 
 - **Static 1**: an orthogonal mesh, consisting of $N \times N$ quadrilateral
   cells constructed using `blockMesh`.
-- **Static 2**: starts with the mesh from variant 1 and applies a smooth
+- **Static 2**: starts with the mesh from Static 1 and applies a smooth
   distortion to the internal mesh points using a *bump* function. In the limit
   of mesh refinement, the local face non-orthogonality goes to zero; that is,
   the mesh becomes effectively orthogonal for fine meshes.
-- **Static 3**: starts with the mesh from variant 1 and applies smooth distort
-  internally *and* at the boundary using a sinuisoidal function. Like variant 2,
+- **Static 3**: starts with the mesh from Static 1 and applies smooth distort
+  internally *and* at the boundary using a sinuisoidal function. Like Static 2,
   the internal mesh faces become orthogonal in the limit of mesh refinement;
-  however, unlike variant 2, finite non-orthogonality remains at the boundary
+  however, unlike Static 2, finite non-orthogonality remains at the boundary
   faces even in the limit of mesh refinement. In this way, this variant assesses
   whether the discretisation consistently deals with boundary non-orthogonality.
-- **Static 4**: starts with the mesh from variant 1 and applies a random
+- **Static 4**: starts with the mesh from Static 1 and applies a random
   perturbation to each internal mesh point. This perturbation is applied
   independently to each mesh level. Unlike previous variants, face
   non-orthogonality remains finite internally and at the boundary in this
@@ -108,11 +127,11 @@ In addition to the static mesh variants, four moving mesh variants are considere
   is prescribed. The mesh is moved such that all mesh faces remain orthogonal.
   This allows the effect of mesh motion to be assessed independently of mesh
   non-orthogonality and skewness.
-- **Moving 2**: the smooth mesh distortion from variant 2 is applied as a
-  time-varying mesh motion. Like variant 2, internal and boundary face
+- **Moving 2**: the smooth mesh distortion from Static 2 is applied as a
+  time-varying mesh motion. Like Static 2, internal and boundary face
   non-orthogonality go to zero in the limit of mesh refinement.
-- **Moving 3**: the smooth mesh distortion of variant 3 is applied as a
-  time-varying mesh motion. Like variant 3, internal face non-orthogonality go to
+- **Moving 3**: the smooth mesh distortion of Static 3 is applied as a
+  time-varying mesh motion. Like Static 3, internal face non-orthogonality go to
   zero in the limit of mesh refinement but boundary face non-orthogonality
   remains finite.
 
@@ -198,12 +217,23 @@ functions
             // Lookup U
             const auto& U = mesh().lookupObject<volVectorField>("U");
 
-            // Calcalulate the average
             // Calculate the error
+            const volScalarField magError("magError", mag(U - exactU));
+            Info<< "Writing magError to " << time().timeName() << endl;
+            magError.write();
+            const scalarField& Vol = mesh().V().field();
+            const scalar totalVol = gSum(Vol);
             const vectorField diff(U - exactU);
-            const scalar errorL1(gAverage(mag(diff)));
-            const scalar errorL2(sqrt(gAverage(magSqr(diff))));
-            const scalar errorLInf(gMax(mag(diff)));
+
+            // Arithmetic errors
+            // const scalar errorL1 = gAverage(mag(diff));
+            // const scalar errorL2 = sqrt(gAverage(magSqr(diff)));
+            // const scalar errorLInf = gMax(mag(diff));
+
+            // Volume-weighted errors
+            const scalar errorL1 = gSum(mag(diff*Vol))/totalVol;
+            const scalar errorL2 = sqrt(gSum(magSqr(diff)*Vol)/totalVol);
+            const scalar errorLInf = gMax(mag(diff));
 
             Info<< "Velocity errors norms:" << nl
                 << "    mean L1 = " << errorL1 << nl

@@ -30,33 +30,10 @@ boundaryField
         type            fixedGradientCorrected;
         gradient        uniform 0;
 
-        // zeroGradient and codedFixedValue does NOT employ non-orthogonal
-        // corrections and hence will approach zero-order accuracy for grids
-        // which contain boundary non-orthogonality in the limit of mesh
-        // refinement
+        // zeroGradient does NOT employ non-orthogonal corrections and hence
+        // will approach zero-order accuracy for grids which contain boundary
+        // non-orthogonality in the limit of mesh refinement
         // type            zeroGradient;
-        // type            codedFixedValue;
-        // name            decayingTaylorGreenVortexPressure;
-
-        // code
-        // #{
-        //     const scalar Re = 10;
-        //     const scalar t = db().time().value();
-        //     const scalar pi = constant::mathematical::pi;
-        //     const scalar A = Foam::exp(-4.0*sqr(pi)*t/Re);
-
-        //     const scalarField x(patch().Cf().component(vector::X));
-        //     const scalarField y(patch().Cf().component(vector::Y));
-
-        //     const scalarField pressure
-        //     (
-        //         A*0.25*(Foam::cos(2*pi*x) + Foam::cos(2*pi*y))
-        //     );
-
-        //     operator==(pressure);
-        // #};
-
-        // value           uniform 0;
     }
     frontAndBack
     {
