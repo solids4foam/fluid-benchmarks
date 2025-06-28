@@ -243,12 +243,18 @@ then
     cp ../plotScripts/*gnuplot .
     cp ../plotScripts/orderOfAccuracySlopes*.dat .
 
-    # Run all scripts
+    # Run all plotting scripts for each config summary
     echo
-    for f in *gnuplot
+    for summary in *summary.txt
     do
-        echo "Running gnuplot on $f"
-        gnuplot "$f"
+        for script in *gnuplot
+        do
+            echo "Running gnuplot on $script for $summary"
+            # Pass the config name (parsed from the summary file name) as input
+            # to the script, to be used as the name of the output file.
+            configName="${summary%.summary.txt}"
+            gnuplot -c "$script" "$configName"
+        done
     done
 fi
 
