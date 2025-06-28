@@ -1,7 +1,15 @@
 set term pdfcairo dashed enhanced
 set datafile separator " "
 
-set output "velocityErrors.pdf"
+if (ARGC < 1) {
+    print "Error: No input configuration name provided."
+    print "usage: ", ARG0, " <configName>"
+    exit
+} else {
+    configName = ARG1
+}
+
+set output configName.".velocityErrors.pdf"
 
 #set size ratio 1
 
@@ -29,8 +37,8 @@ dx=0.2
 
 # Assume the mesh spacing is being halved for each succesive mesh
 plot \
-    "hex.lu.summary.txt" u (1e3*dx/(2**($0))):($4) w lp pt 5 lc "green" t "L_1", \
-    "hex.lu.summary.txt" u (1e3*dx/(2**($0))):($5) w lp pt 15 lc "red" t "L_2", \
-    "hex.lu.summary.txt" u (1e3*dx/(2**($0))):($6) w lp pt 9 lc "blue" t "L_∞", \
+    configName.".summary.txt" u (1e3*dx/(2**($0))):($4) w lp pt 5 lc "green" t "L_1", \
+    configName.".summary.txt" u (1e3*dx/(2**($0))):($5) w lp pt 15 lc "red" t "L_2", \
+    configName.".summary.txt" u (1e3*dx/(2**($0))):($6) w lp pt 9 lc "blue" t "L_∞", \
     "orderOfAccuracySlopesVelocity.dat" u 1:2 w l lw 2 lc "black" notitle, \
     "orderOfAccuracySlopesVelocity.dat" u 1:3 w l lw 2 lc "black" notitle
