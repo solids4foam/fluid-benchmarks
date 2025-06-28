@@ -1,6 +1,46 @@
 #!/bin/bash
 cd "${0%/*}" || exit    # Run from this directory
 
+# Detect the CPU type: we append this to the case name
+if [[ "$OSTYPE" == "darwin"* ]]
+then
+    # macOS
+    CPU_TYPE=$(sysctl -n machdep.cpu.brand_string | sed 's/[^a-zA-Z0-9]/_/g')
+elif [[ -f /proc/cpuinfo ]]
+then
+    # Linux
+    CPU_TYPE=$(grep -m 1 "model name" /proc/cpuinfo | awk -F': ' '{print $2}' | sed 's/[^a-zA-Z0-9]/_/g')
+else
+    # Fallback if neither method works
+    CPU_TYPE="Unknown_CPU"
+fi
+
+# Log the simulations in the second recursive call to the script when the run
+# directory is already created.
+if [ "$RECURSIVE_CALL" != "true" ]
+then
+    # Create timestamped working directory for this run
+    DATE_TIME=$(date +%Y%m%d_%H%M%S)
+    RUN_DIR="run_${CPU_TYPE}_${DATE_TIME}"
+    LOG_FILE="$RUN_DIR/log.Allrun"
+    echo "Creating ${RUN_DIR}"
+    mkdir "${RUN_DIR}"
+
+    # Make these variable visible to the recursive call to this script
+    export DATE_TIME
+    export RUN_DIR
+    export CPU_TYPE
+
+    printf "DATE_TIME: %s\n" $DATE_TIME | tee "$LOG_FILE"
+    printf "CPU_TYPE: %s\n\n" $CPU_TYPE | tee -a "$LOG_FILE"
+
+    # Make sure run directory is not created again in the recursive call
+    export RECURSIVE_CALL=true
+    ./Allrun 2>&1 | tee -a "$LOG_FILE"
+
+    exit 0
+fi
+
 # Source required functions
 . $WM_PROJECT_DIR/bin/tools/RunFunctions
 source solids4FoamScripts.sh
@@ -37,26 +77,6 @@ configs=(
 # END_MESH should be greater than START_MESH
 START_MESH=1
 END_MESH=5
-
-# Detect the CPU type: we append this to the case name
-if [[ "$OSTYPE" == "darwin"* ]]
-then
-    # macOS
-    CPU_TYPE=$(sysctl -n machdep.cpu.brand_string | sed 's/[^a-zA-Z0-9]/_/g')
-elif [[ -f /proc/cpuinfo ]]
-then
-    # Linux
-    CPU_TYPE=$(grep -m 1 "model name" /proc/cpuinfo | awk -F': ' '{print $2}' | sed 's/[^a-zA-Z0-9]/_/g')
-else
-    # Fallback if neither method works
-    CPU_TYPE="Unknown_CPU"
-fi
-
-# Create timestamped working directory for this run
-DATE_TIME=$(date +%Y%m%d_%H%M%S)
-RUN_DIR="run_${CPU_TYPE}_${DATE_TIME}"
-echo "Creating ${RUN_DIR}"
-mkdir "${RUN_DIR}"
 
 # Enter the run directory
 cd "${RUN_DIR}"
