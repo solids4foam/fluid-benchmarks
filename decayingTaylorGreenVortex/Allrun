@@ -150,7 +150,7 @@ do
                 \cp system/smoothlyDistortMeshPointsDict.sine \
                     system/smoothlyDistortMeshPointsDict
             fi
-                
+
             solids4Foam::runApplication smoothlyDistortMeshPoints
         fi
 
