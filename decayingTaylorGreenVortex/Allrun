@@ -245,14 +245,21 @@ then
 
     # Run all plotting scripts for each config summary
     echo
-    for summary in *summary.txt
+    for script in *gnuplot
     do
-        for script in *gnuplot
+        for datafile in *summary.txt
         do
-            echo "Running gnuplot on $script for $summary"
-            # Pass the config name (parsed from the summary file name) as input
-            # to the script, to be used as the name of the output file.
-            configName="${summary%.summary.txt}"
+            echo "Running gnuplot on $script for $datafile"
+            # Pass the config name as input to the script, to be used as the
+            # name of the output file.
+            configName="${datafile%.summary.txt}"
+            gnuplot -c "$script" "$configName"
+        done
+
+        for datafile in *orderOfAccuracy.txt
+        do
+            echo "Running gnuplot on $script for $datafile"
+            configName="${datafile%.orderOfAccuracy.txt}"
             gnuplot -c "$script" "$configName"
         done
     done
