@@ -25,11 +25,11 @@ set ylabel "Order of accuracy"
 set key bottom left;
 
 # Average mesh spacing of mesh1
-dx=0.2
+dx = 0.2
 
 # Assume the mesh spacing is being halved for each succesive mesh
+datafile = configName.".orderOfAccuracy.txt"
 plot \
-    configName.".orderOfAccuracy.txt" using (1e3*dx/(2**($0))):2 skip 1 w lp pt 5 lc "green" t "L_1", \
-    configName.".orderOfAccuracy.txt" using (1e3*dx/(2**($0))):3 skip 1 w lp pt 5 lc "red" t "L_2", \
-    configName.".orderOfAccuracy.txt" using (1e3*dx/(2**($0))):4 skip 1 w lp pt 4 lc "blue" t "L_∞"
-
+    datafile using (1e3*dx/(2**($0))):2 skip 1 w lp pt 5 lc "green" t "L_1", \
+    datafile using (1e3*dx/(2**($0))):3 skip 1 w lp pt 5 lc "red" t "L_2", \
+    datafile using (1e3*dx/(2**($0))):4 skip 1 w lp pt 4 lc "blue" t "L_∞"
