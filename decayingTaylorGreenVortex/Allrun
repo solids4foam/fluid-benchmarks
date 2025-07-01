@@ -246,7 +246,7 @@ then
     echo
 
     # Run velocity error scripts for each configuration
-    errorScript="velocityErrors.gnuplot "
+    errorScript="velocityErrors.gnuplot"
     for datafile in *summary.txt
     do
         echo "Running gnuplot on $script for $datafile"
