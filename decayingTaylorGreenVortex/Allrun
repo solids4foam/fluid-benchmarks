@@ -243,25 +243,26 @@ then
     cp ../plotScripts/*gnuplot .
     cp ../plotScripts/orderOfAccuracySlopes*.dat .
 
-    # Run all plotting scripts for each config summary
     echo
-    for script in *gnuplot
-    do
-        for datafile in *summary.txt
-        do
-            echo "Running gnuplot on $script for $datafile"
-            # Pass the config name as input to the script, to be used as the
-            # name of the output file.
-            configName="${datafile%.summary.txt}"
-            gnuplot -c "$script" "$configName"
-        done
 
-        for datafile in *orderOfAccuracy.txt
-        do
-            echo "Running gnuplot on $script for $datafile"
-            configName="${datafile%.orderOfAccuracy.txt}"
-            gnuplot -c "$script" "$configName"
-        done
+    # Run velocity error scripts for each configuration
+    errorScript="velocityErrors.gnuplot "
+    for datafile in *summary.txt
+    do
+        echo "Running gnuplot on $script for $datafile"
+        # Pass the config name as input to the script, to be used as the
+        # name of the output file.
+        configName="${datafile%.summary.txt}"
+        gnuplot -c "$errorScript" "$configName"
+    done
+
+    # Run order of accuracy scripts for each configuration
+    orderOfAccuracyScript="orderOfAccuracyVelocity.gnuplot"
+    for datafile in *orderOfAccuracy.txt
+    do
+        echo "Running gnuplot on $script for $datafile"
+        configName="${datafile%.orderOfAccuracy.txt}"
+        gnuplot -c "$orderOfAccuracyScript" "$configName"
     done
 fi
 
