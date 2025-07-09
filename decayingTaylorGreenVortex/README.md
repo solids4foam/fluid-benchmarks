@@ -18,8 +18,12 @@ The 2-D, transient Taylor–Green decaying vortex flow has an analytical solutio
  non-dimensional form is given by
 
 $$
-u(x, y, t) = e^{-2\pi^2 t/\text{Re}} \sin(\pi x) \cos(\pi y) \\
-v(x, y, t) = -e^{-2\pi^2 t/\text{Re}} \cos(\pi x) \sin(\pi y) \\
+u(x, y, t) = e^{-2\pi^2 t/\text{Re}} \sin(\pi x) \cos(\pi y)
+$$
+$$
+v(x, y, t) = -e^{-2\pi^2 t/\text{Re}} \cos(\pi x) \sin(\pi y)
+$$
+$$
 p(x, y, t) =
     e^{-4\pi^2 t/\text{Re}} \frac{1}{4}
     \left[\cos(2\pi x) + \sin(2\pi y)\right] + C
