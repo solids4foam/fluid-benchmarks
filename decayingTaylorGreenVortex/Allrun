@@ -28,8 +28,9 @@ configs=(
 #                  smoothlyDistortMeshPoints
 # BUMP:            bump or sinusoidal version of smoothlyDistortMeshPoints (if
 #                  SMOOTHLYDISTORT is enabled)
-# PERTURB:         apply a random perturbtation to the initial mesh using
-#                  perturbMeshPoints
+# PERTURB:         Apply a random perturbation to the initial mesh using
+#                  perturbMeshPoints. A value of 0 disables it; any non-zero
+#                  value enables it and is used as the random seed.
 # PIMPLEFOAM:      use the pimpleFoam or solids4Foam solver
 
 # Define start and end mesh indices
@@ -60,6 +61,12 @@ mkdir "${RUN_DIR}"
 
 # Enter the run directory
 cd "${RUN_DIR}"
+
+# If any configuration perturbs the mesh, create a combined summary file
+if [[ "${configs[*]}" =~ PERTURB=([1-9][0-9]*) ]]; then
+    PERTURB_SUMMARIES="perturb_summaries.txt"
+    echo "# Mesh Time Mem U_L1 U_L2 U_Linf" > "${PERTURB_SUMMARIES}"
+fi
 
 # Iterate through configurations
 for config in "${configs[@]}"
@@ -154,9 +161,18 @@ do
             solids4Foam::runApplication smoothlyDistortMeshPoints
         fi
 
-        # Optional mesh distortion
-        if [ "$PERTURB" -eq 1 ]
+        # Optional random mesh perturbation
+        if [ "$PERTURB" -ne 0 ]
         then
+            # Set the seed value for the random number generator
+            if [ $WM_PROJECT = "foam" ]
+            then
+                # Assumes the seed is as an integer
+                sed -i -E "s/^(seed\s+)[0-9]+(;)/\1$PERTURB\2/" system/perturbMeshPointsDict
+            else
+                foamDictionary -entry seed -set "$PERTURB" system/perturbMeshPointsDict
+            fi
+
             solids4Foam::runApplication perturbMeshPoints
         fi
 
@@ -221,6 +237,11 @@ do
 
         # Write data to file
         echo "$i $CLOCK_TIME $MAX_MEMORY $U_L1_ERROR $U_L2_ERROR $U_LINF_ERROR" >> ../"${SUMMARY}"
+
+        if [ "$PERTURB" -ne 0 ]
+        then
+            echo "$i $CLOCK_TIME $MAX_MEMORY $U_L1_ERROR $U_L2_ERROR $U_LINF_ERROR" >> ../"${PERTURB_SUMMARIES}"
+        fi
 
         cd ..
     done
