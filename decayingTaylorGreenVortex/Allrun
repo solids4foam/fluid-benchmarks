@@ -245,22 +245,22 @@ then
 
     echo
 
-    # Run velocity error scripts for each configuration
+    # Run the velocity error script for each configuration
     errorScript="velocityErrors.gnuplot"
     for datafile in *summary.txt
     do
-        echo "Running gnuplot on $script for $datafile"
+        echo "Running gnuplot on $errorScript for $datafile"
         # Pass the config name as input to the script, to be used as the
         # name of the output file.
         configName="${datafile%.summary.txt}"
         gnuplot -c "$errorScript" "$configName"
     done
 
-    # Run order of accuracy scripts for each configuration
+    # Run the order of accuracy script for each configuration
     orderOfAccuracyScript="orderOfAccuracyVelocity.gnuplot"
     for datafile in *orderOfAccuracy.txt
     do
-        echo "Running gnuplot on $script for $datafile"
+        echo "Running gnuplot on $orderOfAccuracyScript for $datafile"
         configName="${datafile%.orderOfAccuracy.txt}"
         gnuplot -c "$orderOfAccuracyScript" "$configName"
     done
