@@ -285,6 +285,16 @@ then
         configName="${datafile%.orderOfAccuracy.txt}"
         gnuplot -c "$orderOfAccuracyScript" "$configName"
     done
+
+    # Run the linear fit plot script for perturbation configurations
+    if [ -e "$PERTURB_SUMMARIES" ]
+    then
+        linearFitErrorScript="linearFitVelocityErrors.gnuplot"
+        datafile="$PERTURB_SUMMARIES"
+
+        echo "Running gnuplot on $linearFitErrorScript for $datafile"
+        gnuplot -c "$linearFitErrorScript" "$datafile"
+    fi
 fi
 
 # Exit the run directory
