@@ -197,14 +197,55 @@ The case is examined using both static and moving meshes. Four variants of
 - **Static 4**: starts with the mesh from Static 1 and applies a random
   perturbation to each internal mesh point. This type of mesh can be generated
   by setting `SMOOTHLYDISTORT=0 BUMP=0 PERTURB=1` in the configuration in
-  `Allrun`. This perturbation is applied independently to each mesh level.
-  Unlike previous variants, face non-orthogonality remains finite internally and
-  at the boundary in this variant. As such, this variant is the most challenge
-  static mesh from the discretisation perspective. Assessing the order of
-  accuracy on these types of grids may require multiple simulations at each grid
-  level using different random perturbation parameters; a best fit approach can
-  then be used to determine the order of accuracy from the error vs average mesh
-  spacing plots.
+  `Allrun`. The perturbation of a point is calculated as a scale factor times
+  the local minimum edge length.
+
+    $$
+    \mathbf{p}_i' = \mathbf{p}_i +
+    l_i
+    \begin{bmatrix}
+    \text{rand}_x & 0             & 0             \\
+    0             & \text{rand}_y & 0             \\
+    0             & 0             & \text{rand}_z \\
+    \end{bmatrix}
+    \begin{bmatrix}
+    s_x \\
+    s_y \\
+    s_z \\
+    \end{bmatrix}
+    $$
+
+    - $\mathbf{p}_i$: original position of point $i$ in the orthogonal mesh
+    - $\mathbf{p}_i'$: new position of point $i$ after perturbation
+    - $l_i$: local minimum edge length at point $i$
+    - $\text{rand}_x, \text{rand}_y, \text{rand}_z$: random numbers generated in $x$, $y$, and $z$ direction
+    - $\mathbf{s} = (s_x, s_y, s_z)$: scale factor vector
+
+    Two types of distribution can be chosen:
+
+    1. Gaussian Distribution: (mean 0, variance 1)
+
+    $$
+    \text{rand}_x, \text{rand}_y, \text{rand}_z \sim \mathcal{N}(0, 1)
+    $$
+
+    2. Uniform Distribution: (uniform in $[-1, 1]$)
+
+    $$
+    \text{rand}_x, \text{rand}_y, \text{rand}_z \sim \text{Uniform}(-1, 1)
+    $$
+
+    This perturbation is applied independently to each mesh level. Unlike
+    previous variants, face non-orthogonality remains finite internally and at
+    the boundary in this variant. As such, this variant is the most challenge
+    static mesh from the discretisation perspective.
+
+    ![Image of perturbed mesh with seed value of 1](./images/perturbed_meshes.png)
+
+    Assessing the order of accuracy on these types of grids may require multiple
+    simulations at each grid level using different random perturbation
+    parameters; a best fit approach can then be used to determine the order of
+    accuracy from the error vs average mesh spacing plots.
 
 In addition to the static mesh variants, four moving mesh variants are considered:
 
