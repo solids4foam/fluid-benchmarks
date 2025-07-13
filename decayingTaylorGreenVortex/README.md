@@ -115,15 +115,11 @@ The case is examined using both static and moving meshes. Four variants of
     $$
     \mathbf{p}_i' = \mathbf{p}_i +
     \begin{bmatrix}
-    A_x & 0   & 0   \\
-    0   & A_y & 0   \\
-    0   & 0   & A_z \\
+    A_x \\
+    A_y \\
+    A_z
     \end{bmatrix}
-    \begin{bmatrix}
-    f(x,y) \\
-    f(x,y) \\
-    f(x,y) \\
-    \end{bmatrix},
+    f(x, y),
     $$
     $$
     f(x, y) = x^2(1 - x)^2 \, y^2(1 - y)^2.
@@ -158,18 +154,13 @@ The case is examined using both static and moving meshes. Four variants of
     $$
     \mathbf{p}_i' = \mathbf{p}_i +
     \begin{bmatrix}
-    A_x & 0   & 0   \\
-    0   & A_y & 0   \\
-    0   & 0   & A_z \\
-    \end{bmatrix}
-    \begin{bmatrix}
     f_x(x, y) \\
     f_y(x, y) \\
-    f_z(x, y) \\
+    f_z(x, y)
     \end{bmatrix},
     $$
     $$
-    f_j(x, y) = \sin(B_j \pi x) \sin(C_j \pi y)
+    f_j(x, y) = A_j \sin(B_j \pi x) \sin(C_j \pi y)
     \quad \text{where}\quad j = x, y, z
     $$
 
@@ -202,16 +193,10 @@ The case is examined using both static and moving meshes. Four variants of
 
     $$
     \mathbf{p}_i' = \mathbf{p}_i +
-    l_i
     \begin{bmatrix}
-    \text{rand}_x & 0             & 0             \\
-    0             & \text{rand}_y & 0             \\
-    0             & 0             & \text{rand}_z \\
-    \end{bmatrix}
-    \begin{bmatrix}
-    s_x \\
-    s_y \\
-    s_z \\
+    \text{rand}_x s_x l_i \\
+    \text{rand}_y s_y l_i \\
+    \text{rand}_z s_z l_i
     \end{bmatrix}
     $$
 
@@ -223,17 +208,8 @@ The case is examined using both static and moving meshes. Four variants of
 
     Two types of distribution can be chosen:
 
-    1. Gaussian Distribution: (mean 0, variance 1)
-
-    $$
-    \text{rand}_x, \text{rand}_y, \text{rand}_z \sim \mathcal{N}(0, 1)
-    $$
-
-    2. Uniform Distribution: (uniform in $[-1, 1]$)
-
-    $$
-    \text{rand}_x, \text{rand}_y, \text{rand}_z \sim \text{Uniform}(-1, 1)
-    $$
+    1. Gaussian Distribution: $\mathcal{N}(0, 1)$ (mean 0, variance 1)
+    2. Uniform Distribution: $\text{Uniform}(-1, 1)$
 
     This perturbation is applied independently to each mesh level. Unlike
     previous variants, face non-orthogonality remains finite internally and at
