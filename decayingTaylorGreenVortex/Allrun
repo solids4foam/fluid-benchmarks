@@ -16,7 +16,7 @@ configs=(
     "BASE=base NAME=hex.lu GRADED=1 \
     MOVING=0 ORTHOGONAL=0 \
     SMOOTHLYDISTORT=1 PERTURB=0 BUMP=0 \
-    PIMPLEFOAM=1"
+    PIMPLEFOAM=0"
 )
 # BASE:            name of the base template case
 # NAME:            base name given to each case that is created
@@ -37,29 +37,37 @@ configs=(
 # Mesh input files are defined from 1 to 7
 # END_MESH should be greater than START_MESH
 START_MESH=1
-END_MESH=5
+END_MESH=4
 
-# Detect the CPU type: we append this to the case name
-if [[ "$OSTYPE" == "darwin"* ]]
+# Use first argument as run directory, or create one if not provided
+if [ -n "$1" ]
 then
-    # macOS
-    CPU_TYPE=$(sysctl -n machdep.cpu.brand_string | sed 's/[^a-zA-Z0-9]/_/g')
-elif [[ -f /proc/cpuinfo ]]
-then
-    # Linux
-    CPU_TYPE=$(grep -m 1 "model name" /proc/cpuinfo | awk -F': ' '{print $2}' | sed 's/[^a-zA-Z0-9]/_/g')
+    RUN_DIR="$1"
 else
-    # Fallback if neither method works
-    CPU_TYPE="Unknown_CPU"
+    # Detect the CPU type: we append this to the case name
+    if [[ "$OSTYPE" == "darwin"* ]]
+    then
+        # macOS
+        CPU_TYPE=$(sysctl -n machdep.cpu.brand_string | sed 's/[^a-zA-Z0-9]/_/g')
+    elif [[ -f /proc/cpuinfo ]]
+    then
+        # Linux
+        CPU_TYPE=$(grep -m 1 "model name" /proc/cpuinfo | awk -F': ' '{print $2}' | sed 's/[^a-zA-Z0-9]/_/g')
+    else
+        # Fallback if neither method works
+        CPU_TYPE="Unknown_CPU"
+    fi
+
+    # Create timestamped working directory for this run
+    DATE_TIME=$(date +%Y%m%d_%H%M%S)
+    RUN_DIR="run_${CPU_TYPE}_${DATE_TIME}"
+
+    echo "Creating ${RUN_DIR}"
+    mkdir "${RUN_DIR}"
 fi
 
-# Create timestamped working directory for this run
-DATE_TIME=$(date +%Y%m%d_%H%M%S)
-RUN_DIR="run_${CPU_TYPE}_${DATE_TIME}"
-echo "Creating ${RUN_DIR}"
-mkdir "${RUN_DIR}"
-
 # Enter the run directory
+echo "Entering ${RUN_DIR}"
 cd "${RUN_DIR}"
 
 # If any configuration perturbs the mesh, create a combined summary file

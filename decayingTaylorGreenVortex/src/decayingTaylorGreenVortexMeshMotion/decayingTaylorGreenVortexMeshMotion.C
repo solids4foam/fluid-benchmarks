@@ -174,8 +174,6 @@ void Foam::decayingTaylorGreenVortexMeshMotion::solve()
             A_*Foam::sin(pi*t/0.8)*Foam::sin(pi*x)
            *Foam::sin(pi*y)*vector(1, 1, 0);
     }
-
-    pointDisplacement_.correctBoundaryConditions();
 }
 
 

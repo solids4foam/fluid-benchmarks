@@ -1,0 +1,26 @@
+#!/bin/bash
+cd "${0%/*}" || exit    # Run from this directory
+
+# Date and time
+DATE_TIME=$(date +%Y%m%d_%H%M%S)
+
+# Detect the CPU type: we append this to the case name
+if [[ "$OSTYPE" == "darwin"* ]]
+then
+    # macOS
+    CPU_TYPE=$(sysctl -n machdep.cpu.brand_string | sed 's/[^a-zA-Z0-9]/_/g')
+elif [[ -f /proc/cpuinfo ]]
+then
+    # Linux
+    CPU_TYPE=$(grep -m 1 "model name" /proc/cpuinfo | awk -F': ' '{print $2}' | sed 's/[^a-zA-Z0-9]/_/g')
+else
+    # Fallback if neither method works
+    CPU_TYPE="Unknown_CPU"
+fi
+
+# Run directory
+RUN_DIR="run_${CPU_TYPE}_${DATE_TIME}"
+mkdir "$RUN_DIR"
+
+# Execute Allrun and store the log in the run directory
+./Allrun "$RUN_DIR" 2>&1 | tee "$RUN_DIR/log.Allrun"
