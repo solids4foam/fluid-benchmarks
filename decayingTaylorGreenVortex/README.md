@@ -125,9 +125,9 @@ The case is examined using both static and moving meshes. Four variants of
     f(x, y) = x^2(1 - x)^2 \, y^2(1 - y)^2.
     $$
 
-    - $\mathbf{p}_i$: original position of point $i$ in the orthogonal mesh
-    - $\mathbf{p}_i'$: new position of point $i$ after distortion
-    - $\mathbf{A} = (A_x, A_y, A_z)$: magnitude/scale vector
+- $\mathbf{p}_i$: original position of point $i$ in the orthogonal mesh
+- $\mathbf{p}_i'$: new position of point $i$ after distortion
+- $\mathbf{A} = (A_x, A_y, A_z)$: magnitude/scale vector
 
     ![Surface plot of the bump function. Given the small magnitude of distortions in this particular domain, the function is scaled by 100 for clarity.](./images/bump_function.png)
 
@@ -164,11 +164,11 @@ The case is examined using both static and moving meshes. Four variants of
     \quad \text{where}\quad j = x, y, z
     $$
 
-    - $\mathbf{p}_i$: original position of point $i$ in the orthogonal mesh
-    - $\mathbf{p}_i'$: new position of point $i$ after distortion
-    - $\mathbf{A} = (A_x, A_y, A_z)$: magnitude/scale vector
-    - $\mathbf{B} = (B_x, B_y, B_z)$ and $\mathbf{C} = (C_x, C_y, C_z)$:
-      frequency vectors
+- $\mathbf{p}_i$: original position of point $i$ in the orthogonal mesh
+- $\mathbf{p}_i'$: new position of point $i$ after distortion
+- $\mathbf{A} = (A_x, A_y, A_z)$: magnitude/scale vector
+- $\mathbf{B} = (B_x, B_y, B_z)$ and $\mathbf{C} = (C_x, C_y, C_z)$:
+  frequency vectors
 
     ![Surface plot of the sinusoidal distortion function.](./images/sinusoidal_function.png)
 
@@ -200,11 +200,12 @@ The case is examined using both static and moving meshes. Four variants of
     \end{bmatrix}
     $$
 
-    - $\mathbf{p}_i$: original position of point $i$ in the orthogonal mesh
-    - $\mathbf{p}_i'$: new position of point $i$ after perturbation
-    - $l_i$: local minimum edge length at point $i$
-    - $\text{rand}_x, \text{rand}_y, \text{rand}_z$: random numbers generated in $x$, $y$, and $z$ direction
-    - $\mathbf{s} = (s_x, s_y, s_z)$: scale factor vector
+- $\mathbf{p}_i$: original position of point $i$ in the orthogonal mesh
+- $\mathbf{p}_i'$: new position of point $i$ after perturbation
+- $l_i$: local minimum edge length at point $i$
+- $\text{rand}_x, \text{rand}_y, \text{rand}_z$: random numbers generated in $x$,
+  $y$, and $z$ direction
+- $\mathbf{s} = (s_x, s_y, s_z)$: scale factor vector
 
     Two types of distribution can be chosen:
 
