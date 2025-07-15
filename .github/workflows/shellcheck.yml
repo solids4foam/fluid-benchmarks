@@ -1,0 +1,38 @@
+# Check shell scripts for bugs with shellcheck
+name: ShellCheck
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@master
+        with:
+          submodules: recursive
+
+      - name: Install ShellCheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+
+      - name: Run ShellCheck
+        env:
+          # Disable some of the unnecessary warnings
+          # [SC2048]: warning: Use "$@" (with quotes) to prevent whitespace problems.
+          # [SC2086]: warning: Double quote to prevent globbing and word splitting.
+          # [SC2164]: warning: Use 'cd ... || exit' or 'cd ... || return' in case cd fails.
+          SHELLCHECK_OPTS: --exclude=SC2048,SC2086,SC2164
+        run: |
+          find . -type f -regex '.*All\(run\|runWithLogging\|wmake\|clean\).*' \
+               -exec shellcheck \
+                     --severity=warning \
+                     --shell=bash \
+                     --format=gcc \
+                     {} +
