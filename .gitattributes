@@ -1,0 +1,30 @@
+* text=auto eol=lf
+
+*.C     text diff=cpp
+*.H     text diff=cpp
+
+*.md    text diff=markdown
+
+Allrun*     text diff=bash
+Allclean    text diff=bash
+Allwmake    text diff=bash
+
+# Binary files (do not attempt to diff or alter line endings)
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.svg   binary
+*.pdf   binary
+*.ico   binary
+*.gz    binary
+*.zip   binary
+*.tar   binary
+*.tgz   binary
+
+*.vtk   binary
+*.vtu   binary
+*.eMesh binary
+*.stl   binary
+*.obj   binary
+*.msh   binary
