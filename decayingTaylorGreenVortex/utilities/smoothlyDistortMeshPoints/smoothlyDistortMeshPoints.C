@@ -36,6 +36,12 @@ Description
 
     where A[x-z], B[x-z] and C[x-z] are user-provided parameters.
 
+    \note The sinusoidal distortion function has a non-zero derivative at the
+    boundary of the domain, which gives rise to finite non-orthogonality at the
+    boundary in the limit of mesh refinement. On the other hand, the bump
+    function has a zero derivative at the boundary, so the non-orthogonality
+    vanishes when the mesh is sufficiently refined.
+
     Patches which should not move can be defined via the fixedPatches entry.
 
     The inputs are defined in $FOAM_CASE/system/smoothlyDistortMeshPointsDict
