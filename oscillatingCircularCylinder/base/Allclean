@@ -4,6 +4,3 @@
 . $WM_PROJECT_DIR/bin/tools/CleanFunctions
 
 cleanCase
-
-echo "Cleaning plots:"
-find . -name '*.pdf' -print0 | xargs --null rm -fv
