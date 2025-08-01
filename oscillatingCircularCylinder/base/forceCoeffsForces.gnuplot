@@ -11,7 +11,7 @@ datafile =  "./postProcessing/forces/0/force.dat"
 set output 'forceCoeffsForces.pdf'
 
 set title "Lift and Drag Coefficients vs. Time (via 'forces' function object)"
-set xlabel "Time, $t$ [s]"
+set xlabel "Time, t [s]"
 set grid
 set key top left
 
@@ -41,13 +41,13 @@ forceScaling = 1.0/(Aref*pDyn)
 
 # -------------------------------------------------------------------------- #
 
-set ylabel "$C_d$"
+set ylabel "C_d [1]"
 set xrange [0:24]
 set yrange [-4.5:4.5]
 # $2 corresponds to x component of the fluid force on the cylinder
 plot datafile using 1:(forceScaling*$2) with lines title "Drag Coefficient"
 
-set ylabel "$C_l$"
+set ylabel "C_l [1]"
 set xrange [0:24]
 set yrange [-0.06:0.06]
 # $3 corresponds to y component of the fluid force on the cylinder
