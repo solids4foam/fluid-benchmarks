@@ -113,6 +113,8 @@ cylinderCells   ( 736 736 1);
 
 downstreamCells $upstreamCells;
 
+#message "MESH_LEVEL: $MESH_LEVEL"
+
 blocks
 (
     // Upstream block
