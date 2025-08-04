@@ -30,5 +30,5 @@ fi
 #              coefficients in two ways:
 #              1) using the data from `forces` function object,
 #              2) using the data from `forceCoeffs` function object.
-gnuplot -c ./forceCoeffsFnObject.gnuplot
-gnuplot -c ./forceCoeffsForces.gnuplot
+gnuplot -c ../plotScripts/forceCoeffsFnObject.gnuplot
+gnuplot -c ../plotScripts/forceCoeffsForces.gnuplot
