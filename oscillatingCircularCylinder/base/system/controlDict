@@ -1,0 +1,131 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| solids4foam: solid mechanics and fluid-solid interaction simulations        |
+| Version:     v2.0                                                           |
+| Web:         https://solids4foam.github.io                                  |
+| Disclaimer:  This offering is not approved or endorsed by OpenCFD Limited,  |
+|              producer and distributor of the OpenFOAM software via          |
+|              www.openfoam.com, and owner of the OPENFOAM® and OpenCFD®      |
+|              trade marks.                                                   |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     solids4Foam;
+
+startFrom       latestTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         24;
+
+deltaT          0.005;
+
+writeControl    runTime;
+
+writeInterval   0.05;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable   yes;
+
+adjustTimeStep  no;
+
+maxCo           10;
+
+functions
+{
+    forces
+    {
+        type            forces;
+        libs            (forces);
+
+        // Fluid force and moment on the following patches will be calculated
+        patches         (cylinderWall);
+
+        // Field names
+        p               p;
+        U               U;
+        rho             rhoInf;
+        // Freestream density
+        rhoInf          1;
+
+        // Center of rotation (required for moment calculation)
+        CofR            (0 0 0);
+
+        writeControl    $/writeControl;
+        writeInterval   $/writeInterval;
+        log             on;
+    }
+
+    // Generate drag (Cd) and lift (Cl) coefficients over the cylinder patch
+    forceCoeffs
+    {
+        type            forceCoeffs;
+        libs            (forces);
+
+        // Fluid force and moment on the following patches will be calculated
+        patches         (cylinderWall);
+
+        // Only report drag (Cd) and lift (Cl) coefficients and omit others
+        coefficients    (Cd Cl);
+
+        // Frequency and amplitude of cylinder displacement oscillation
+        f               0.25;
+        A               0.25;
+        // NOTE(abzrg): Here I considered the maximum x-velocity of the cylinder
+        //              patch: u_max = max(2*π*f*A*cos(2*π*f*t))
+        magUxMax        ${{ 2*pi()*$f*$A }}; // Maximum x velocity magnitude
+
+        // Freestream velocity magnitude
+        magUInf         $magUxMax; // 0.39269908169872414
+
+        // Span of mesh in the z (depth) direction
+        // See blockMeshDict.vertices
+        meshSpanZ       0.1;
+        // Diameter of the cylinder
+        cylDiameter     0.1;
+        // Reference length
+        lRef            $cylDiameter;
+        // Reference area (projected area per unit depth in 2D)
+        Aref            ${{ $meshSpanZ * $cylDiameter }};
+
+        // Center of rotation
+        CofR            (0 0 0);
+
+        // Direction of the drag force
+        // C_d = F_x/(0.5*ρ*U^2*A)
+        dragDir         (1 0 0);
+
+        // Direction of the lift force
+        // C_l = F_y/(0.5*ρ*U^2*A)
+        liftDir         (0 1 0);
+
+        // Field names
+        p               p;
+        U               U;
+        rho             rhoInf; // Indicates incompressible
+        rhoInf          1;      // Redundant for incompressible-flow cases
+
+        writeControl    $/writeControl;
+        writeInterval   $/writeInterval;
+        log             on;
+    }
+}
+ 
+
+// ************************************************************************* //

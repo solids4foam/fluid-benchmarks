@@ -1,0 +1,209 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| solids4foam: solid mechanics and fluid-solid interaction simulations        |
+| Version:     v2.0                                                           |
+| Web:         https://solids4foam.github.io                                  |
+| Disclaimer:  This offering is not approved or endorsed by OpenCFD Limited,  |
+|              producer and distributor of the OpenFOAM software via          |
+|              www.openfoam.com, and owner of the OPENFOAM® and OpenCFD®      |
+|              trade marks.                                                   |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+scale   1;
+
+// Domain: [0, 2.2]*[0, 0.4]
+/* TODO(abzrg): to parameterize or not to parameterize
+xMin 0.0;
+xMax 2.2;
+yMin 0.0;
+yMax 0.41;
+l    ${{ $xMax - $xMin }};
+h    ${{ $yMax - $yMin }};
+x0   1.1;
+y0   0.2;
+d    0.1;
+*/
+
+vertices
+(
+    (0                  0                   0)     // 00                (inlet bottom)
+    (0.895              0                   0)     // 01 (x1 = x0 - y0) (square region around the cylinder of size equal to domain height)
+    (1.305              0                   0)     // 02 (x2 = x0 + y0) (ditto)
+    (2.2                0                   0)     // 03                (inlet top)
+    (1.0646446609406728 0.16464466094067265 0)     // 04 (x4 = x0 - d/2*cos(pi/4), y4 = y0 - d/2*sin(pi/4))
+    (1.1353553390593274 0.16464466094067265 0)     // 05 (x5 = x0 + d/2*cos(pi/4), y5 = y0 - d/2*sin(pi/4))
+    (1.0646446609406728 0.23535533905932737 0)     // 06 (x6 = x0 - d/2*cos(pi/4), y6 = y0 + d/2*sin(pi/4))
+    (1.1353553390593274 0.23535533905932737 0)     // 07 (x7 = x0 + d/2*cos(pi/4), y7 = y0 + d/2*sin(pi/4))
+    (0                  0.41                0)     // 08                (outlet bottom)
+    (0.895              0.41                0)     // 09                (square region around the cylinder of size equal to domain height)
+    (1.305              0.41                0)     // 10                (ditto)
+    (2.2                0.41                0)     // 11                (outlet top)
+
+    (0                  0                   0.1)   // 12
+    (0.895              0                   0.1)   // 13
+    (1.305              0                   0.1)   // 14
+    (2.2                0                   0.1)   // 15
+    (1.0646446609406728 0.16464466094067265 0.1)   // 16
+    (1.1353553390593274 0.16464466094067265 0.1)   // 17
+    (1.0646446609406728 0.23535533905932737 0.1)   // 18
+    (1.1353553390593274 0.23535533905932737 0.1)   // 19
+    (0                  0.41                0.1)   // 20
+    (0.895              0.41                0.1)   // 21
+    (1.305              0.41                0.1)   // 22
+    (2.2                0.41                0.1)   // 23
+);
+
+// Mesh density level. Higher values correspond to finer meshes
+// It is an integer in the range [1,8]. (Default = 1)
+//
+// One can specify the mesh density level from the command-line by simply using
+// the following:
+//
+//              ```console
+//              $ MESH_LEVEL=<N> blockMesh
+//           or
+//              $ MESH_LEVEL=<N> ./Allrun
+//              ```
+MESH_LEVEL ${MESH_LEVEL:-1};
+
+#if #eval "$MESH_LEVEL == 1"
+// 220 cells
+upstreamCells   (12 5 1);
+cylinderCells   ( 5 5 1);
+#elif #eval "$MESH_LEVEL == 2"
+// 1'034 cells
+upstreamCells   (25 11 1);
+cylinderCells   (11 11 1);
+#elif #eval "$MESH_LEVEL == 3"
+// 4'416 cells
+upstreamCells   (50 23 1);
+cylinderCells   (23 23 1);
+#elif #eval "$MESH_LEVEL == 4"
+// 17'664 cells
+upstreamCells   (100 46 1);
+cylinderCells   ( 46 46 1);
+#elif #eval "$MESH_LEVEL == 5"
+// 70'656 cells
+upstreamCells   (200 92 1);
+cylinderCells   ( 92 92 1);
+#elif #eval "$MESH_LEVEL == 6"
+// 282'624 cells
+upstreamCells   (400 184 1);
+cylinderCells   (184 184 1);
+#elif #eval "$MESH_LEVEL == 7"
+// 1'130'496 cells
+upstreamCells   (800 368 1);
+cylinderCells   (368 368 1);
+#elif #eval "$MESH_LEVEL == 8"
+// 4'521'984 cells
+upstreamCells   (1600 736 1);
+cylinderCells   ( 736 736 1);
+#else
+#message "--> Error: Invalid mesh level: MESH_LEVEL = $MESH_LEVEL."
+#message "Mesh level must be an integer in the range [1,8]."
+{{}}
+#endif
+
+downstreamCells $upstreamCells;
+
+#message "MESH_LEVEL: $MESH_LEVEL"
+
+blocks
+(
+    // Upstream block
+    hex (0 1 9 8 12 13 21 20) $upstreamCells simpleGrading (1 1 1)
+
+    // Surrounding Box blocks
+
+        // West of cylinder
+        hex (1  4  6 9 13 16 18 21) $cylinderCells simpleGrading (1 1 1)
+
+        // South of cylinder
+        hex (1  2  5 4 13 14 17 16) $cylinderCells simpleGrading (1 1 1)
+
+        // East of cylinder
+        hex (2 10  7 5 14 22 19 17) $cylinderCells simpleGrading (1 1 1)
+
+        // North of cylinder
+        hex (6  7 10 9 18 19 22 21) $cylinderCells simpleGrading (1 1 1)
+
+    // Downstream block
+    hex (2 3 11 10 14 15 23 22) $downstreamCells simpleGrading (1 1 1)
+);
+
+edges
+(
+    arc 4 5 origin (1.1 0.2 0)
+    arc 5 7 origin (1.1 0.2 0)
+    arc 7 6 origin (1.1 0.2 0)
+    arc 6 4 origin (1.1 0.2 0)
+
+    arc 16 17 origin (1.1 0.2 0.1)
+    arc 17 19 origin (1.1 0.2 0.1)
+    arc 19 18 origin (1.1 0.2 0.1)
+    arc 18 16 origin (1.1 0.2 0.1)
+);
+
+defaultPatch
+{
+    name    frontAndBack;
+    type    empty;
+}
+
+boundary
+(
+    inlet
+    {
+        type patch;
+        faces
+        (
+            (8 0 12 20)
+        );
+    }
+    outlet
+    {
+        type patch;
+        faces
+        (
+            (3 11 23 15)
+        );
+    }
+    walls
+    {
+        type wall;
+        faces
+        (
+            ( 0  1 13 12)
+            ( 1  2 14 13)
+            ( 2  3 15 14)
+            ( 9  8 20 21)
+            (10  9 21 22)
+            (11 10 22 23)
+        );
+    }
+    cylinderWall
+    {
+        type wall;
+        faces
+        (
+            (4 6 18 16)
+            (5 4 16 17)
+            (7 5 17 19)
+            (6 7 19 18)
+        );
+    }
+);
+
+mergePatchPairs
+(
+);
+
+
+// ************************************************************************* //

@@ -1,0 +1,67 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| solids4foam: solid mechanics and fluid-solid interaction simulations        |
+| Version:     v2.0                                                           |
+| Web:         https://solids4foam.github.io                                  |
+| Disclaimer:  This offering is not approved or endorsed by OpenCFD Limited,  |
+|              producer and distributor of the OpenFOAM software via          |
+|              www.openfoam.com, and owner of the OPENFOAM® and OpenCFD®      |
+|              trade marks.                                                   |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvSchemes;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+ddtSchemes
+{
+    default backward;
+}
+
+gradSchemes
+{
+    default leastSquares;
+}
+
+divSchemes
+{
+    default             none;
+    div(U)              Gauss linear;
+    div(phi,U)          Gauss linearUpwind grad(U);
+    div(devRhoReff)     Gauss linear;
+    jacobian-div(phi,U) Gauss upwind;
+    div((nuEff*dev2(T(grad(U)))))   Gauss linear;
+}
+
+laplacianSchemes
+{
+    default                 Gauss linear limited corrected 1;
+    laplacian(nuEff,U)      Gauss linear corrected;
+    laplacian((1|A(U)),p)   Gauss linear corrected;
+    laplacian(rAU,p)        Gauss linear corrected;
+    laplacian(diffusivity,cellMotionU)      Gauss linear corrected;
+    laplacian(diffusivity,cellDisplacement) Gauss linear corrected;
+}
+
+interpolationSchemes
+{
+    default linear;
+    interpolate(U)  skewCorrected linear;
+}
+
+snGradSchemes
+{
+    default corrected;
+}
+
+fluxRequired
+{
+    default no;
+    p;
+}
+
+
+// ************************************************************************* //

@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+cd "${0%/*}" || exit    # Run from this directory
+
+# Source tutorial run functions
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+# Generate the mesh
+MESH_LEVEL=${MESH_LEVEL:-1} runApplication blockMesh
+
+if [ "$1" = '-p' ];
+then
+    # Decopose mesh
+    NUMBER_OF_SUBDOMAINS=${NUMBER_OF_SUBDOMAINS:-4} \
+        runApplication decomposePar
+
+    # Run the solver (parallel)
+    FLUID_MODEL=${FLUID_MODEL:-pimpleFluid} \
+    runParallel $(getApplication)
+
+    # Deconstruct the result
+    runApplication reconstructPar -no-fields -latestTime
+else
+    # Run the solver (serial)
+    FLUID_MODEL=${FLUID_MODEL:-pimpleFluid} \
+        runApplication $(getApplication)
+fi
+
+# Generate the plots
+# NOTE(abzrg): For testing purposes and sanity checks I plotted the force
+#              coefficients in two ways:
+#              1) using the data from `forces` function object,
+#              2) using the data from `forceCoeffs` function object.
+gnuplot -c ./forceCoeffsFnObject.gnuplot
+gnuplot -c ./forceCoeffsForces.gnuplot
