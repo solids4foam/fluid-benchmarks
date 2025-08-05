@@ -14,8 +14,8 @@ wmake -j -s all utilities
 # Define configurations as space-separated strings
 configs=(
     "BASE=base NAME=hex.lu GRADED=1 \
-    MOVING=0 ORTHOGONAL=0 \
-    SMOOTHLYDISTORT=1 PERTURB=0 BUMP=0 \
+    MOVING=1 ORTHOGONAL=1 \
+    SMOOTHLYDISTORT=0 PERTURB=0 BUMP=0 \
     PIMPLEFOAM=0"
 )
 # BASE:            name of the base template case
@@ -37,7 +37,7 @@ configs=(
 # Mesh input files are defined from 1 to 7
 # END_MESH should be greater than START_MESH
 START_MESH=1
-END_MESH=4
+END_MESH=5
 
 # Use first argument as run directory, or create one if not provided
 if [ -n "$1" ]
