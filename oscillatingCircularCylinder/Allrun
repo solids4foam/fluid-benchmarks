@@ -213,17 +213,23 @@ do
                 printf "Running %s (%s processes) on %s with gtime\n" \
                     "${FLUID_MODEL}" "${NUMBER_OF_SUBDOMAINS:-4}" "${CASE}"
                 FLUID_MODEL="${FLUID_MODEL}" \
-                    gtime -f "${TIME_FORMAT}" solids4Foam &> "${LOG}"
+                    gtime -f "${TIME_FORMAT}" \
+                    mpirun -np "${NUMBER_OF_SUBDOMAINS:-4}" \
+                    solids4Foam -parallel &> "${LOG}"
             elif command -v time &> /dev/null
             then
                 printf "Running %s (%s processes) on %s with time\n" \
                     "${FLUID_MODEL}" "${NUMBER_OF_SUBDOMAINS:-4}" "${CASE}"
                 FLUID_MODEL="${FLUID_MODEL}" \
-                    command time -f "${TIME_FORMAT}" solids4Foam &> "${LOG}"
+                    command time -f "${TIME_FORMAT}" \
+                    mpirun -np "${NUMBER_OF_SUBDOMAINS:-4}" \
+                    solids4Foam -parallel &> "${LOG}"
             else
                 printf "Running %s (%s processes) on %s with (bash) time\n" \
                     "${FLUID_MODEL}" "${NUMBER_OF_SUBDOMAINS:-4}" "${CASE}"
-                FLUID_MODEL="${FLUID_MODEL}" solids4Foam &> "${LOG}"
+                FLUID_MODEL="${FLUID_MODEL}" \
+                    mpirun -np "${NUMBER_OF_SUBDOMAINS:-4}" \
+                    solids4Foam -parallel &> "${LOG}"
             fi
 
             # Deconstruct the result
