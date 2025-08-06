@@ -228,6 +228,7 @@ do
                 printf "Running %s (%s processes) on %s with (bash) time\n" \
                     "${FLUID_MODEL}" "${NUMBER_OF_SUBDOMAINS:-4}" "${CASE}"
                 FLUID_MODEL="${FLUID_MODEL}" \
+                    time \
                     mpirun -np "${NUMBER_OF_SUBDOMAINS:-4}" \
                     solids4Foam -parallel &> "${LOG}"
             fi
@@ -250,7 +251,8 @@ do
             else
                 printf "Running %s on %s with (bash) time\n" \
                     "${FLUID_MODEL}" "${CASE}"
-                FLUID_MODEL="${FLUID_MODEL}" solids4Foam &> "${LOG}"
+                FLUID_MODEL="${FLUID_MODEL}" \
+                    time solids4Foam &> "${LOG}"
             fi
         fi
 
