@@ -4,13 +4,13 @@
 #     Run the simulation for various configurations (see the `configs` array
 #     below).
 #
-# Arguments:
+# Arguments
 #     $1
 #         (optional) Path to the run directory (`RUN_DIR`). If the path does not
 #         exist, the script will create it. If the path exists but is not empty,
 #         the script will exit.
 #
-# Environment Variables:
+# Environment Variables
 :     "${PARALLEL:=0}"
 #         (optional) If set to 1, the script will run each case in parallel. If
 #         unset or set to any value other than 1, it will run each case in
@@ -19,7 +19,7 @@
 :     "${NUMBER_OF_SUBDOMAINS:=4}"
 #         (optional) Specifies the number of subdomains for `decomposePar`.
 #
-# Examples:
+# Examples
 #     $ ./Allrun
 #     $ ./Allrun /path/to/specific/run/directory/
 #     $ PARALLEL=1 ./Allrun
