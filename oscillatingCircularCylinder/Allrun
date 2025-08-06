@@ -264,8 +264,11 @@ do
         # 6. Plot the force coefficients
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         echo "Generating plots for force coefficients"
-        gnuplot -c "${BENCHMARK_ROOT}"/plotScripts/forceCoeffsFnObject.gnuplot
-        gnuplot -c "${BENCHMARK_ROOT}"/plotScripts/forceCoeffsForces.gnuplot
+        cp "${BENCHMARK_ROOT}"/plotScripts/*.gnuplot .
+        for script in ./*.gnuplot
+        do
+            gnuplot -c "${script}"
+        done
 
         echo "Leaving ${CASE}"
         cd ../
