@@ -5,18 +5,19 @@
 #     below).
 #
 # Arguments:
-#     $1: (optional)
-#         Path to the run directory (`RUN_DIR`). If the path does not exist,
-#         the script will create it. If the path exists but is not empty,
+#     $1
+#         (optional) Path to the run directory (`RUN_DIR`). If the path does not
+#         exist, the script will create it. If the path exists but is not empty,
 #         the script will exit.
 #
 # Environment Variables:
-#     PARALLEL: (optional, default: 0)
-#         If set to 1, the script will run each case in parallel. If unset or
-#         set to any value other than 1, it will run each case in serial.
+:     "${PARALLEL:=0}"
+#         (optional) If set to 1, the script will run each case in parallel. If
+#         unset or set to any value other than 1, it will run each case in
+#         serial.
 #
-#     NUMBER_OF_SUBDOMAINS: (optional, default: 4)
-#         Specifies the number of subdomains for `decomposePar`.
+:     "${NUMBER_OF_SUBDOMAINS:=4}"
+#         (optional) Specifies the number of subdomains for `decomposePar`.
 #
 # Examples:
 #     $ ./Allrun
@@ -204,32 +205,32 @@ do
         if (( PARALLEL == 1 ))
         then
             # Decompose mesh
-            NUMBER_OF_SUBDOMAINS=${NUMBER_OF_SUBDOMAINS:-4} \
+            NUMBER_OF_SUBDOMAINS=${NUMBER_OF_SUBDOMAINS} \
                 solids4Foam::runApplication decomposePar
 
             # Run in parallel
             if command -v gtime &> /dev/null
             then
                 printf "Running %s (%s processes) on %s with gtime\n" \
-                    "${FLUID_MODEL}" "${NUMBER_OF_SUBDOMAINS:-4}" "${CASE}"
+                    "${FLUID_MODEL}" "${NUMBER_OF_SUBDOMAINS}" "${CASE}"
                 FLUID_MODEL="${FLUID_MODEL}" \
                     gtime -f "${TIME_FORMAT}" \
-                    mpirun -np "${NUMBER_OF_SUBDOMAINS:-4}" \
+                    mpirun -np "${NUMBER_OF_SUBDOMAINS}" \
                     solids4Foam -parallel &> "${LOG}"
             elif command -v time &> /dev/null
             then
                 printf "Running %s (%s processes) on %s with time\n" \
-                    "${FLUID_MODEL}" "${NUMBER_OF_SUBDOMAINS:-4}" "${CASE}"
+                    "${FLUID_MODEL}" "${NUMBER_OF_SUBDOMAINS}" "${CASE}"
                 FLUID_MODEL="${FLUID_MODEL}" \
                     command time -f "${TIME_FORMAT}" \
-                    mpirun -np "${NUMBER_OF_SUBDOMAINS:-4}" \
+                    mpirun -np "${NUMBER_OF_SUBDOMAINS}" \
                     solids4Foam -parallel &> "${LOG}"
             else
                 printf "Running %s (%s processes) on %s with (bash) time\n" \
-                    "${FLUID_MODEL}" "${NUMBER_OF_SUBDOMAINS:-4}" "${CASE}"
+                    "${FLUID_MODEL}" "${NUMBER_OF_SUBDOMAINS}" "${CASE}"
                 FLUID_MODEL="${FLUID_MODEL}" \
                     time \
-                    mpirun -np "${NUMBER_OF_SUBDOMAINS:-4}" \
+                    mpirun -np "${NUMBER_OF_SUBDOMAINS}" \
                     solids4Foam -parallel &> "${LOG}"
             fi
 
