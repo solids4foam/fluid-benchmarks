@@ -6,8 +6,8 @@ set terminal pdfcairo enhanced color solid
 set datafile commentschars "#"
 set datafile separator whitespace
 dataFile = "./postProcessing/forceCoeffs/0/coefficient.dat"
-validCdDataFile = "./Cd.ssv"
-validClDataFile = "./Cl.ssv"
+validCdDataFile = "./Cd.dat"
+validClDataFile = "./Cl.dat"
 
 set output "forceCoeffsFnObject.pdf"
 
