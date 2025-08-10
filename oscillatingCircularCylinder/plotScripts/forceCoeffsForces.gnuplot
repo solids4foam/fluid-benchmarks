@@ -5,7 +5,7 @@ set terminal pdfcairo enhanced color solid
 
 set datafile separator whitespace
 set datafile commentschars "#"
-dataFile =  "./postProcessing/forces/0/force.dat"
+dataFile = "./postProcessing/forces/0/force.dat"
 validCdDataFile = "./Cd.dat"
 validClDataFile = "./Cl.dat"
 

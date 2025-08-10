@@ -3,8 +3,8 @@
 
 set terminal pdfcairo enhanced color solid
 
-set datafile commentschars "#"
 set datafile separator whitespace
+set datafile commentschars "#"
 dataFile = "./postProcessing/forceCoeffs/0/coefficient.dat"
 validCdDataFile = "./Cd.dat"
 validClDataFile = "./Cl.dat"
