@@ -4,3 +4,6 @@
 . $WM_PROJECT_DIR/bin/tools/CleanFunctions
 
 cleanCase
+
+# Delete gnuplot scripts
+rm -fv ./*.gnuplot
