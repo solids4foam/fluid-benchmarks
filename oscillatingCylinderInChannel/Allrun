@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# Source tutorial clean functions
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+# Backup 0
+mv 0 0.tmp
+
+# Create the triangular prism mesh
+MESH_SPACING_SCALE_FACTOR=0.25
+runApplication gmsh -3 -format msh2 -setnumber sf $MESH_SPACING_SCALE_FACTOR oscillatingCylinderInChannel.geo
+runApplication gmshToFoam oscillatingCylinderInChannel.msh
+
+# Convert to a polyhedral prism mesh
+runApplication polyDualMesh 45 -overwrite
+runApplication combinePatchFaces 45 -overwrite
+runApplication extrudeMesh
+runApplication changeDictionary
+
+# Restore 0
+mv 0.tmp 0
+
+# Run the solver
+runApplication solids4Foam

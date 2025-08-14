@@ -1,0 +1,46 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| solids4foam: solid mechanics and fluid-solid interaction simulations        |
+| Version:     v2.0                                                           |
+| Web:         https://solids4foam.github.io                                  |
+| Disclaimer:  This offering is not approved or endorsed by OpenCFD Limited,  |
+|              producer and distributor of the OpenFOAM software via          |
+|              www.openfoam.com, and owner of the OPENFOAM® and OpenCFD®      |
+|              trade marks.                                                   |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fluidProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+fluidModel newtonIcoFluid;
+
+newtonIcoFluidCoeffs
+{
+    // Trottenberg gives 1/16 for Stokes flow
+    // It needs to be higher for higher Re numbers
+    //omega     [0 -2 1 0 0 0 0] 0.0625;
+    omega     [0 -2 1 0 0 0 0] 1;
+    localReRef 1e6;
+    omegaExponent 1;
+    alphaU    1.0;
+    //pressureSmoothingCoeff 0.1;
+
+    // Pressure reference
+    pRefCell 0;
+    pRefValue 0;
+
+    // PETSc options file used by PETScSNES
+    optionsFile petscOptions.pcsplit2D;
+    //optionsFile petscOptions.lu;
+    //optionsFile petscOptions.hypre;
+    //optionsFile petscOptions.ilu;
+    //optionsFile petscOptions.newton;
+
+    //stopOnPetscError no;
+}
+
+// ************************************************************************* //
