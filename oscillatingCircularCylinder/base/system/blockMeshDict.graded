@@ -239,38 +239,50 @@ defaultPatch
 
 boundary
 (
-    inlet
+    left
     {
-        type patch;
+        type wall;
+        inGroups (noSlipWalls);
         faces
         (
             (8 0 12 20)
         );
     }
-    outlet
+    right
     {
-        type patch;
+        type wall;
+        inGroups (noSlipWalls);
         faces
         (
             (3 11 23 15)
         );
     }
-    walls
+    up
     {
         type wall;
+        inGroups (slipWalls);
         faces
         (
-            ( 0  1 13 12)
-            ( 1  2 14 13)
-            ( 2  3 15 14)
             ( 9  8 20 21)
             (10  9 21 22)
             (11 10 22 23)
         );
     }
-    cylinderWall
+    down
     {
         type wall;
+        inGroups (slipWalls);
+        faces
+        (
+            (0 1 13 12)
+            (1 2 14 13)
+            (2 3 15 14)
+        );
+    }
+    cylinder
+    {
+        type wall;
+        inGroups (movingWall);
         faces
         (
             (4  6 18 16)
