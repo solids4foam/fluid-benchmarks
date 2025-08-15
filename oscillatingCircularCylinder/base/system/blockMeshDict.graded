@@ -122,7 +122,9 @@ blocks
     simpleGrading
     (
         (
-            (1 1 0.125)
+            (0.3 0.375 4)
+            (0.4 0.25 1)
+            (0.3 0.375 0.25)
         )
         (
             (0.25 0.3 2)
@@ -203,11 +205,13 @@ blocks
         )
 
     // Downstream block
-    hex ( 2 3 11 10 14 15 23 22 ) $downstreamCells
+    hex (2 3 11 10 14 15 23 22) $downstreamCells
     simpleGrading
     (
         (
-            (1 1 8)
+            (0.3 0.375 4)
+            (0.4 0.25 1)
+            (0.3 0.375 0.25)
         )
         (
             (0.25 0.3 2)
