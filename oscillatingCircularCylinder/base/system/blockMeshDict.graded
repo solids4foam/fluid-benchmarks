@@ -118,7 +118,7 @@ downstreamCells $upstreamCells;
 blocks
 (
     // Upstream block
-    hex ( 0 1 9 8 12 13 21 20 ) $upstreamCells
+    hex (0 1 9 8 12 13 21 20) $upstreamCells
     simpleGrading
     (
         (
@@ -135,7 +135,7 @@ blocks
     // Surrounding Box blocks
 
         // West of cylinder
-        hex ( 1 4 6 9 13 16 18 21 ) $cylinderCells
+        hex (1 4 6 9 13 16 18 21) $cylinderCells
         simpleGrading
         (
             (
@@ -152,7 +152,7 @@ blocks
         )
 
         // South of cylinder
-        hex ( 1 2 5 4 13 14 17 16 ) $cylinderCells
+        hex (1 2 5 4 13 14 17 16) $cylinderCells
         simpleGrading
         (
             (
@@ -169,7 +169,7 @@ blocks
         )
 
         // East of cylinder
-        hex ( 2 10 7 5 14 22 19 17 ) $cylinderCells
+        hex (2 10 7 5 14 22 19 17) $cylinderCells
         simpleGrading
         (
             (
@@ -186,7 +186,7 @@ blocks
         )
 
         // North of cylinder
-        hex ( 6 7 10 9 18 19 22 21 ) $cylinderCells
+        hex (6 7 10 9 18 19 22 21) $cylinderCells
         simpleGrading
         (
             (
@@ -285,10 +285,10 @@ boundary
         inGroups (movingWall);
         faces
         (
-            (4  6 18 16)
-            (5  4 16 17)
-            (7  5 17 19)
-            (6  7 19 18)
+            (4 6 18 16)
+            (5 4 16 17)
+            (7 5 17 19)
+            (6 7 19 18)
         );
     }
 );
