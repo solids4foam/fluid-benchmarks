@@ -6,4 +6,4 @@
 cleanCase
 
 # Delete gnuplot scripts
-rm -fv ./*.gnuplot
+rm -fv ./*.gnuplot ./*.dat
