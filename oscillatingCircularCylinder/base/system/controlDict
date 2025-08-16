@@ -55,7 +55,7 @@ functions
         libs            (forces);
 
         // Fluid force and moment on the following patches will be calculated
-        patches         (cylinderWall);
+        patches         (cylinder);
 
         // Field names
         p               p;
@@ -79,7 +79,7 @@ functions
         libs            (forces);
 
         // Fluid force and moment on the following patches will be calculated
-        patches         (cylinderWall);
+        patches         (cylinder);
 
         // Only report drag (Cd) and lift (Cl) coefficients and omit others
         coefficients    (Cd Cl);

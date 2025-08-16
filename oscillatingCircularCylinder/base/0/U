@@ -22,7 +22,7 @@ internalField   uniform (0 0 0);
 
 boundaryField
 {
-    cylinderWall
+    cylinder
     {
         type            movingWallVelocity;
         value           uniform (0 0 0);

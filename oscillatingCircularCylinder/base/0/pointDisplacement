@@ -22,7 +22,7 @@ internalField   uniform (0 0 0);
 
 boundaryField
 {
-    cylinderWall
+    cylinder
     {
 #if 0
         name    pointDisplacement_cylinder;
@@ -63,20 +63,20 @@ boundaryField
 #endif
     }
 
-    walls
+    slipWalls
     {
         type    slip;
+    }
+
+    noSlipWalls
+    {
+        type    fixedValue;
+        value   $internalField;
     }
 
     frontAndBack
     {
         type    empty;
-    }
-
-    ".*"
-    {
-        type    fixedValue;
-        value   $internalField;
     }
 }
 
