@@ -24,7 +24,7 @@ motionSolver        displacementLaplacian;
 
 displacementLaplacianCoeffs
 {
-    diffusivity     inverseDistance (cylinderWall);
+    diffusivity     inverseDistance (cylinder);
 }
 
 
