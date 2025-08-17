@@ -76,8 +76,8 @@ $$
 + y_{{\rm cyl}_0} \, \mathbf{j},
 $$
 
-where $t$ is time, $A = 0.25 \rm m$ is the oscillation amplitude, $\omega = 2\pi f$ is
- the angular velocity, $f = 0.25 \rm Hz$ is the oscillation frequency, and
+where $t$ is time, $A = 0.25 \rm m$ is the oscillation amplitude, $\omega = 2\pi
+ f$ is the angular velocity, $f = 0.25 \rm Hz$ is the oscillation frequency, and
  $\mathbf{x}_{{\rm cyl}_0}$ is the initial location points on the `cylinder`
  patch. This motion is specified in the `0/pointsDisplacement` file.
 
