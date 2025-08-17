@@ -438,7 +438,7 @@ ddtSchemes
 ## Running the Case
 
 The case can be run using the included `Allrun` script located in the template
- case (`oscillatingCircularCylinder/base`) directory:
+ case (`oscillatingCylinderInChannel/base`) directory:
 
 ```bash
 # Serial run with default values of environment variables
@@ -460,7 +460,7 @@ NUMBER_OF_SUBDOMAINS=8 ./Allrun -p
 MESH_LEVEL=8 NUMBER_OF_SUBDOMAINS=32 FLUID_MODEL=pimpleFluid ./Allrun -p
 ```
 
-or by executing the `Allrun` script in the parent `oscillatingCircularCylinder`
+or by executing the `Allrun` script in the parent `oscillatingCylinderInChannel`
  directory.
 
 ```bash
@@ -472,7 +472,7 @@ PARALLEL=8 ./Allrun
 PARALLEL=8 NUMBER_OF_SUBDOMAINS=32 ./Allrun
 ```
 
-The `oscillatingCircularCylinder/Allrun` script runs multiple cases based on the
+The `oscillatingCylinderInChannel/Allrun` script runs multiple cases based on the
  configurations and a range of mesh density level given at the top of the
  script, e.g.
 
