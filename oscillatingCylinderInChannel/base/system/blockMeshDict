@@ -161,7 +161,8 @@ boundary
 (
     left
     {
-        type patch;
+        type wall;
+        inGroups (noSlipWalls);
         faces
         (
             (8 0 12 20)
@@ -169,15 +170,17 @@ boundary
     }
     right
     {
-        type patch;
+        type wall;
+        inGroups (noSlipWalls);
         faces
         (
             (3 11 23 15)
         );
     }
-    down
+    up
     {
         type wall;
+        inGroups (slipWalls);
         faces
         (
             ( 9  8 20 21)
@@ -185,19 +188,21 @@ boundary
             (11 10 22 23)
         );
     }
-    up
+    down
     {
         type wall;
+        inGroups (slipWalls);
         faces
         (
-            ( 0  1 13 12)
-            ( 1  2 14 13)
-            ( 2  3 15 14)
+            (0 1 13 12)
+            (1 2 14 13)
+            (2 3 15 14)
         );
     }
     cylinder
     {
         type wall;
+        inGroups (movingWall);
         faces
         (
             (4 6 18 16)
