@@ -39,7 +39,7 @@ $$
 $$
   \frac{\partial}{\partial t} \int_{\Omega(t)} \mathbf{U} \mathrm{d}V
 + \int_{\Omega(t)} \nabla \cdot
-  \big[\mathbf{U} \otimes (\mathbf{U} - \mathbf{U}_{\rm g})\big] \mathrm{d}V
+  \big[\mathbf{U} \otimes (\mathbf{U} - \mathbf{U}_{\mathrm g})\big] \mathrm{d}V
 - \int_{\Omega(t)} \nu \nabla^2 \mathbf{U} \mathrm{d}V
 - \int_{\Omega(t)} \nabla p \mathrm{d}V
 = 0,
@@ -47,22 +47,21 @@ $$
 
 where $\mathbf{U}$ denotes the fluid velocity, $p$ is the kinematic pressure,
  $\nu$ is the kinematic viscosity of the fluid, $\rho$ represents the fluid
- density, and $\mathbf{U}_{\rm g}$ is the grid (mesh) velocity. The grid
+ density, and $\mathbf{U}_{\mathrm g}$ is the grid (mesh) velocity. The grid
  velocity $\mathbf{U}_g$ is obtained by solving the **Space Conservation Law
  (SCL)**, also known as the **Grid Conservation Law (GCL)**:
 
 $$
 \frac{\partial}{\partial t} \int_{\Omega(t)} \mathrm{d}V
-- \int_{\Omega(t)} \nabla \cdot \mathbf{U}_{\rm g} \mathrm{d}V = 0.
+- \int_{\Omega(t)} \nabla \cdot \mathbf{U}_{\mathrm g} \mathrm{d}V = 0.
 $$
 
 ```note
 The above formulation is known as the Arbitrary Lagrangian–Eulerian (ALE)
- formulation. If $\mathbf{U}_{\rm{g}} = 0$, we recover the Eulerian description
- (static mesh). If $\mathbf{U}_{\rm{g}} = \mathbf{U}$, we obtain the Lagrangian
- description (mesh moves with fluid particles). Any other case corresponds to
- the ALE description.
-```
+ formulation. If $\mathbf{U}_{\mathrm{g}} = 0$, we recover the Eulerian
+ description (static mesh). If $\mathbf{U}_{\mathrm{g}} = \mathbf{U}$, we obtain
+ the Lagrangian description (mesh moves with fluid particles). Any other case
+ corresponds to the ALE description. ```
 
 ### Cylinder (Boundary) Motion
 
@@ -71,15 +70,16 @@ The displacement of points on the `cylinder` patch, with an initial cylinder
  domain), is given by:
 
 $$
-  \mathbf{x}_{\rm cyl}
-= \left(x_{\rm{cyl}_0} + A \sin(\omega t)\right) \mathbf{i}
-+ y_{{\rm cyl}_0} \mathbf{j},
+  \mathbf{x}_{\mathrm cyl}
+= \left(x_{\mathrm{cyl}_0} + A \sin(\omega t)\right) \mathbf{i}
++ y_{{\mathrm cyl}_0} \mathbf{j},
 $$
 
-where $t$ is time, $A = 0.25 \rm m$ is the oscillation amplitude, $\omega = 2\pi
- f$ is the angular velocity, $f = 0.25 \rm Hz$ is the oscillation frequency, and
- $\mathbf{x}_{{\rm cyl}_0}$ is the initial location points on the `cylinder`
- patch. This motion is specified in the `0/pointsDisplacement` file.
+where $t$ is time, $A = 0.25 \mathrm m$ is the oscillation amplitude, $\omega =
+ 2\pi f$ is the angular velocity, $f = 0.25 \mathrm Hz$ is the oscillation
+ frequency, and $\mathbf{x}_{{\mathrm cyl}_0}$ is the initial location points on
+ the `cylinder` patch. This motion is specified in the `0/pointsDisplacement`
+ file.
 
 ### Boundary condition
 
@@ -112,7 +112,7 @@ The slip boundary condition preserves the initial orthogonality and minimizes
  farthest cylinder can move toward left, as $\sin(2 \pi f t) = -1$ .
 
 $$
-  x_{\text{cell}}\big|_{t=3.0\rm s}
+  x_{\text{cell}}\big|_{t=3.0\mathrm s}
 = A \sin(2 \pi f t)
 = 0.25 \times \sin(2 \times 0.25 \times \pi \times 3 )
 = -0.25 \mathrm{m}
@@ -264,10 +264,11 @@ where $\Delta \mathbf{X}_{\text{cell}}$ is the cell displacement field
 
 `displacementLaplacian` interpolates the cell displacement at cell centers to
  mesh points to obtain the grid point displacement field, $\Delta
- \mathbf{X}_{\rm g}$, and computes new positions based on the initial points,
- $\mathbf{X}_{t_0}$. It then moves the grid points to these new locations.
- This solver smoothly propagates prescribed motion at boundaries or within
- mesh zones to the rest of the domain, preventing skewed or tangled cells.
+ \mathbf{X}_{\mathrm g}$, and computes new positions based on the initial
+ points, $\mathbf{X}_{t_0}$. It then moves the grid points to these new
+ locations. This solver smoothly propagates prescribed motion at boundaries or
+ within mesh zones to the rest of the domain, preventing skewed or tangled
+ cells.
 
 $\Gamma$ determines how the motion of the boundary patch is distributed
  throughout the domain. The value for diffusivity is determined by specifying a
@@ -302,10 +303,10 @@ In this case, the `oscillatingLinearMotion` function is applied, causing the
  `oscillatingLinearMotionCoeffs` dictionary:
 
 $$
-\mathbf{X}_{t_n} = \mathbf{X}_{t_0} + \Delta \mathbf{X}_{\rm g}(t)
+\mathbf{X}_{t_n} = \mathbf{X}_{t_0} + \Delta \mathbf{X}_{\mathrm g}(t)
 $$
 $$
-  \Delta \mathbf{X}_{\rm g}(t)
+  \Delta \mathbf{X}_{\mathrm g}(t)
 = \texttt{amplitude} \times \sin(\texttt{omega} \times t)
 $$
 
@@ -512,10 +513,10 @@ The contour plots at four different time instances, together with the reference
 
 ![TODO(abzrg): ADD FIGURE: CONTOUR PLOT AND STREAM TRACES](placeholder)
 
-To compre quantitatively the drag coefficient, $C_{\rm d}$, and the lift
- coefficient, $C_{\rm l}$, are evaluated against the results reported by Wan and
- Turek[^wan2006]. The comparison shows that the present numerical results are
- virtually identical to those in the reference study.
+To compre quantitatively the drag coefficient, $C_{\mathrm d}$, and the lift
+ coefficient, $C_{\mathrm l}$, are evaluated against the results reported by Wan
+ and Turek[^wan2006]. The comparison shows that the present numerical results
+ are virtually identical to those in the reference study.
 
 ![TODO(abzrg): ADD FIGURE: DRAG COEFFICIENT PLOT](placeholder)
 
@@ -527,13 +528,15 @@ In this 2-D problem, the $x$-axis is defined as the drag direction, with the
  drag coefficient given by
 
 $$
-C_{\rm d} = \frac{2 F_x}{\rho_\infty \mathbf{U}_\infty^2 L_{\text{ref}} L_z},
+  C_{\mathrm d}
+= \frac{2 F_x}{\rho_\infty \mathbf{U}_\infty^2 L_{\text{ref}} L_z},
 $$
 
 and the $y$-axis as the lift direction, with the lift coefficient defined as
 
 $$
-C_{\rm l} = \frac{2 F_y}{\rho_\infty \mathbf{U}_\infty^2 L_{\text{ref}} L_z}.
+  C_{\mathrm l}
+= \frac{2 F_y}{\rho_\infty \mathbf{U}_\infty^2 L_{\text{ref}} L_z}.
 $$
 
 Here, $F_x$ and $F_y$ are the components of the fluid force acting on the
