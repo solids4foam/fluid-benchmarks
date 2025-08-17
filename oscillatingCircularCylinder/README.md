@@ -34,14 +34,14 @@ When the cylinder patch (`cylinder`) begins oscillating, the surrounding
  take the following forms:
 
 $$
-\int_{\Omega(t)} \nabla \cdot \mathbf{U} \, \mathrm{d}V = 0,
+\int_{\Omega(t)} \nabla \cdot \mathbf{U} \mathrm{d}V = 0,
 $$
 $$
-  \frac{\partial}{\partial t} \int_{\Omega(t)} \mathbf{U} \, \mathrm{d}V
+  \frac{\partial}{\partial t} \int_{\Omega(t)} \mathbf{U} \mathrm{d}V
 + \int_{\Omega(t)} \nabla \cdot
-  \big[\mathbf{U} \otimes (\mathbf{U} - \mathbf{U}_{\rm g})\big] \, \mathrm{d}V
-- \int_{\Omega(t)} \nu \, \nabla^2 \mathbf{U} \, \mathrm{d}V
-- \int_{\Omega(t)} \nabla p \, \mathrm{d}V
+  \big[\mathbf{U} \otimes (\mathbf{U} - \mathbf{U}_{\rm g})\big] \mathrm{d}V
+- \int_{\Omega(t)} \nu \nabla^2 \mathbf{U} \mathrm{d}V
+- \int_{\Omega(t)} \nabla p \mathrm{d}V
 = 0,
 $$
 
@@ -53,7 +53,7 @@ where $\mathbf{U}$ denotes the fluid velocity, $p$ is the kinematic pressure,
 
 $$
 \frac{\partial}{\partial t} \int_{\Omega(t)} \mathrm{d}V
-- \int_{\Omega(t)} \nabla \cdot \mathbf{U}_{\rm g} \, \mathrm{d}V = 0.
+- \int_{\Omega(t)} \nabla \cdot \mathbf{U}_{\rm g} \mathrm{d}V = 0.
 $$
 
 ```note
@@ -72,8 +72,8 @@ The displacement of points on the `cylinder` patch, with an initial cylinder
 
 $$
   \mathbf{x}_{\rm cyl}
-= \left(x_{\rm{cyl}_0} + A \sin(\omega t)\right) \, \mathbf{i}
-+ y_{{\rm cyl}_0} \, \mathbf{j},
+= \left(x_{\rm{cyl}_0} + A \sin(\omega t)\right) \mathbf{i}
++ y_{{\rm cyl}_0} \mathbf{j},
 $$
 
 where $t$ is time, $A = 0.25 \rm m$ is the oscillation amplitude, $\omega = 2\pi
