@@ -61,7 +61,8 @@ The above formulation is known as the Arbitrary Lagrangian–Eulerian (ALE)
  formulation. If $\mathbf{U}_{\mathrm{g}} = 0$, we recover the Eulerian
  description (static mesh). If $\mathbf{U}_{\mathrm{g}} = \mathbf{U}$, we obtain
  the Lagrangian description (mesh moves with fluid particles). Any other case
- corresponds to the ALE description. ```
+ corresponds to the ALE description.
+```
 
 ### Cylinder (Boundary) Motion
 
