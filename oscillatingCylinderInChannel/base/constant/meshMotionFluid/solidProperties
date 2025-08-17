@@ -12,31 +12,33 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
-    object      fluidProperties;
+    object      solidProperties;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-fluidModel ${FLUID_MODEL:-pimpleFluid};
+//solidModel    linearGeometryTotalDisplacement;
+//solidModel    nonLinearGeometryTotalLagrangianTotalDisplacement;
+//solidModel    diffusionSolid;
+solidModel    nonLinearGeometryTotalLagrangianTotalDisplacement;
 
-pimpleFluidCoeffs
-{}
-
-newtonIcoFluidCoeffs
+"diffusionSolidCoeffs|linearGeometryTotalDisplacementCoeffs|nonLinearGeometryTotalLagrangianTotalDisplacementCoeffs"
 {
-    // Pressure stabilisation
-    omega     [0 -2 1 0 0 0 0] 1;
-    localReRef      1e6;
-    omegaExponent   1.0;
-    alphaU          1.0;
+    // Solution algorithm
+    //solutionAlgorithm implicitSegregated;
+    solutionAlgorithm PETScSNES;
+    //solutionAlgorithm explicit;
 
-    // Set the pressure to zero at the centre cell
-    pRefPoint       (0.5 0.2 0);
-    pRefValue       0.0;
+    // PETSc options file used by PETScSNES
+    optionsFile petscOptions.lu;
 
-    // PETSc options file used by PETSc SNES
-    optionsFile     petscOptions.pcsplit2D;
-    //optionsFile     petscOptions.lu;
+    // Predictor D at the start of a new time step using U and A
+    //predictor yes;
+
+    stabilisation
+    {
+        type    RhieChow;
+        scaleFactor 1.0;
+    }
 }
-
 
 // ************************************************************************* //

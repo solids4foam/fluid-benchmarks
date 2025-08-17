@@ -1,11 +1,15 @@
 //--------------------------------------------------
 // Global scaling factor
 //--------------------------------------------------
-// sf can be set as a command line option with "-setnumber sf 0.25", e.g.
-// > gmsh -3 -format msh2 -setnumber sf 0.25 oscillatingCylinderInChannel.geo
-If (!Exists(sf))
-  sf = 1.0; // default value
+// The "meshLevel" can be set as a command line option,
+// > gmsh -3 -format msh2 -setnumber meshLevel 2.0 oscillatingCylinderInChannel.geo
+// A larger value corresponds to a finer mesh
+If (!Exists(meshLevel))
+  meshLevel = 1.0; // default value
 EndIf
+
+// Set the global scale factor
+sf = 2.0 / meshLevel;
 
 //--------------------------------------------------
 // Geometry parameters

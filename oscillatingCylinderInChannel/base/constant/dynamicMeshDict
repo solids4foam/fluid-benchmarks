@@ -16,16 +16,14 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dynamicFvMesh       dynamicMotionSolverFvMesh;
+//dynamicFvMesh staticFvMesh;
 
-motionSolverLibs    (fvMotionSolvers);
-
-motionSolver        displacementLaplacian;
-
-displacementLaplacianCoeffs
+dynamicFvMesh   dynamicMotionSolverFvMesh;
+solver          solids4foamSolidModel;
+solids4foamSolidModelCoeffs
 {
-    diffusivity     inverseDistance (cylinderWall);
+    // regionName      region0;
+    regionName      meshMotionFluid;
 }
-
 
 // ************************************************************************* //

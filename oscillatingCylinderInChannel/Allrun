@@ -35,32 +35,38 @@ then
     exit 1
 fi
 
+# Build local libraries
+echo "Building src/correctedFvPatchFields"
+(cd src/correctedFvPatchFields && wmake -j -s libso)
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 # Case configuration settings
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
 # Define configurations as space-separated strings
 configs=(
-    "BASE=base NAME=hex.uniform.lu.pimpleFluid GRADED=0 PIMPLEFLUID=1"
+    "BASE=base NAME=poly.newtonIcoFluid MESH=POLY PIMPLEFLUID=0"
 )
 readonly configs
 # Description
 #     BASE:            name of the base template case
 #     NAME:            base name given to each case that is created
-#     GRADED:          graded (1) or uniform (0) initial mesh
+#     MESH:            Create a structured quadrilaterial (QUAD or QUAD_GRADED)
+#                      mesh, a triangular mesh (TRI) or a polygonal mesh (POLY)
+#                      mesh
 #     PIMPLEFLUID:     use the pimpleFluid (1) or the newtonIcoFluid (0) models
 #
 # Example
 # configs=(
-#     "BASE=base NAME=hex.uniform.lu.newtonIcoFluid GRADED=0 PIMPLEFLUID=0"
-#     "BASE=base NAME=hex.uniform.lu.pimpleFluid    GRADED=0 PIMPLEFLUID=1"
-#     "BASE=base NAME=hex.graded.lu.newtonIcoFluid  GRADED=1 PIMPLEFLUID=0"
-#     "BASE=base NAME=hex.graded.lu.pimpleFluid     GRADED=1 PIMPLEFLUID=1"
+#     "BASE=base NAME=poly.newtonIcoFluid MESH=POLY PIMPLEFLUID=0"
+#     "BASE=base NAME=hex.graded.pimpleFluid MESH=QUAD_GRADED PIMPLEFLUID=1"
 # )
 
 # Mesh level (density) range (integer). Higher values correspond to finer
-# meshes. The minimum level is 1 and the maximum level is 8. For finder meshes
-# edit `${BASE}/system/blockMeshDict*`.
+# meshes. The minimum level is 1 and the maximum level is 8. For finer meshes
+# edit `${BASE}/system/blockMeshDict*` for the quadrilaterial meshes and
+# `${BASE}/gmsh/oscillatingCylinderInChannel.geo` for the triangular and
+# polyhedral meshes
 declare -i START_MESH=1
 declare -i END_MESH=2
 readonly START_MESH END_MESH
@@ -127,7 +133,6 @@ fi
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
 . $WM_PROJECT_DIR/bin/tools/RunFunctions
-source solids4FoamScripts.sh
 
 BENCHMARK_ROOT=$PWD
 echo "Entering ${RUN_DIR}"
@@ -136,8 +141,8 @@ cd "${RUN_DIR}"
 # Iterate through configurations
 for config in "${configs[@]}"
 do
-    declare    BASE NAME
-    declare -i GRADED PIMPLEFLUID
+    declare    BASE NAME MESH
+    declare -i PIMPLEFLUID
 
     # Parse the configuration string
     eval ${config}
@@ -155,33 +160,59 @@ do
         CASE="${NAME}.${mesh_level}"
         printf "\nProcessing case: %s\n" "${CASE}"
 
-        cp -r "$BENCHMARK_ROOT/${BASE}" "$CASE"
+        cp -a "$BENCHMARK_ROOT/${BASE}" "$CASE"
         echo "Entering ${CASE}"
         cd "${CASE}"
 
         # 2. Create the mesh
         #~~~~~~~~~~~~~~~~~~~
-        # Set the blockMeshDict
-        BLOCKMESHDICT="system/blockMeshDict"
-
-        if (( GRADED == 1 ))
+        if [[ "$MESH" == "QUAD"* ]]
         then
-            BLOCKMESHDICT="${BLOCKMESHDICT}.graded"
+            # Set the blockMeshDict
+            BLOCKMESHDICT="system/blockMeshDict"
+
+            if [[ "$MESH" == "QUAD_GRADED" ]]
+            then
+                BLOCKMESHDICT="${BLOCKMESHDICT}.graded"
+            else
+                BLOCKMESHDICT="${BLOCKMESHDICT}.uniform"
+            fi
+
+            if [[ ! -f "${BLOCKMESHDICT}" ]]
+            then
+                printf "Cannot find %s/%s: please add it to %s/system/\n\n" \
+                       "${CASE}" "${BLOCKMESH}" "${BASE}" >&2
+                exit 1
+            fi
+
+            echo "Using ${BLOCKMESHDICT} with mesh level $mesh_level"
+
+            MESH_LEVEL="${mesh_level}" \
+                runApplication blockMesh -dict "${BLOCKMESHDICT}"
+        elif [[ "$MESH" == "TRI" || "$MESH" == "POLY" ]]
+        then
+            if command -v gmsh &> /dev/null
+            then
+                runApplication gmsh -3 -format msh2 -setnumber meshLevel ${mesh_level} gmsh/oscillatingCylinderInChannel.geo
+                runApplication gmshToFoam gmsh/oscillatingCylinderInChannel.msh
+
+                if [[ "$MESH" == "POLY" ]]
+                then
+                    mv 0 0.tmp
+                    runApplication polyDualMesh 45 -overwrite
+                    runApplication combinePatchFaces 45 -overwrite
+                    runApplication extrudeMesh
+                    runApplication changeDictionary
+                    mv 0.tmp 0
+                fi
+            else
+                echo "gmsh not found: please install it"
+                exit 1                
+            fi
         else
-            BLOCKMESHDICT="${BLOCKMESHDICT}.uniform"
-        fi
-
-        if [[ ! -f "${BLOCKMESHDICT}" ]]
-        then
-            printf "Cannot find %s/%s: please add it to %s/system/\n\n" \
-                   "${CASE}" "${BLOCKMESH}" "${BASE}" >&2
+            echo "Unknown mesh type: ${MESH}"
             exit 1
         fi
-
-        echo "Using ${BLOCKMESHDICT} with mesh level $mesh_level"
-
-        MESH_LEVEL="${mesh_level}" \
-            solids4Foam::runApplication blockMesh -dict "${BLOCKMESHDICT}"
 
         # 3. Select and set up the fluid model
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -206,7 +237,7 @@ do
         then
             # Decompose mesh
             NUMBER_OF_SUBDOMAINS=${NUMBER_OF_SUBDOMAINS} \
-                solids4Foam::runApplication decomposePar
+                runApplication decomposePar
 
             # Run in parallel
             if command -v gtime &> /dev/null
@@ -235,7 +266,7 @@ do
             fi
 
             # Deconstruct the result
-            solids4Foam::runApplication reconstructPar -no-fields -latestTime
+            runApplication reconstructPar -no-fields -latestTime
         else
             if command -v gtime &> /dev/null
             then
@@ -271,6 +302,14 @@ do
             gnuplot -c "${script}"
         done
 
+        # 7. Run ParaView script
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        #if command -v pvbatch &> /dev/null
+        #then
+        #    echo "Executing ParaView scripts"
+        #    pvbatch --opengl-window-backend=EGL streamlines.py
+        #fi
+
         echo "Leaving ${CASE}"
         cd ../
     done
@@ -288,4 +327,4 @@ cd ../
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
 printf "\n---------\n\nDone!\n\n"
-echo "View the PDF files in each of the case directories in ${RUN_DIR}"
+#echo "View the PDF files in each of the case directories in ${RUN_DIR}"

@@ -159,23 +159,33 @@ defaultPatch
 
 boundary
 (
-    inlet
+    left
     {
-        type patch;
+        type wall;
         faces
         (
             (8 0 12 20)
         );
     }
-    outlet
+    right
     {
-        type patch;
+        type wall;
         faces
         (
             (3 11 23 15)
         );
     }
-    walls
+    down
+    {
+        type wall;
+        faces
+        (
+            ( 9  8 20 21)
+            (10  9 21 22)
+            (11 10 22 23)
+        );
+    }
+    up
     {
         type wall;
         faces
@@ -183,12 +193,9 @@ boundary
             ( 0  1 13 12)
             ( 1  2 14 13)
             ( 2  3 15 14)
-            ( 9  8 20 21)
-            (10  9 21 22)
-            (11 10 22 23)
         );
     }
-    cylinderWall
+    cylinder
     {
         type wall;
         faces

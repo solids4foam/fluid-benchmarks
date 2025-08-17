@@ -22,14 +22,23 @@ internalField   uniform 0;
 
 boundaryField
 {
-    frontAndBack
-    {
-        type            empty;
-    }
-
     ".*"
     {
-        type            zeroGradient;
+        // fixedGradientCorrected employs non-orthogonal corrections
+        // which are required to achieve second-order accuracy on grids with
+        // boundary non-orthogonality
+        type            fixedGradientCorrected;
+        gradient        uniform 0;
+
+        // zeroGradient does NOT employ non-orthogonal corrections and hence
+        // will approach zero-order accuracy for grids which contain boundary
+        // non-orthogonality in the limit of mesh refinement
+        // type            zeroGradient;
+    }
+
+    "frontAndBack|front|back"
+    {
+        type            empty;
     }
 }
 

@@ -17,9 +17,14 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+libs
+(
+    "libcorrectedFvPatchVectorField.so"
+);
+
 application     solids4Foam;
 
-startFrom       latestTime;
+startFrom       startTime;
 
 startTime       0;
 
@@ -31,9 +36,9 @@ deltaT          0.005;
 
 writeControl    runTime;
 
-writeInterval   0.05;
+writeInterval   24;
 
-writeFormat     ascii;
+writeFormat     binary;
 
 writePrecision  6;
 
@@ -41,7 +46,7 @@ timeFormat      general;
 
 timePrecision   6;
 
-runTimeModifiable   yes;
+runTimeModifiable   no;
 
 adjustTimeStep  no;
 
@@ -55,7 +60,7 @@ functions
         libs            (forces);
 
         // Fluid force and moment on the following patches will be calculated
-        patches         (cylinderWall);
+        patches         (cylinder);
 
         // Field names
         p               p;
@@ -67,9 +72,9 @@ functions
         // Center of rotation (required for moment calculation)
         CofR            (0 0 0);
 
-        writeControl    $/writeControl;
-        writeInterval   $/writeInterval;
-        log             on;
+        writeControl    timeStep;
+        writeInterval   1;
+        log             off;
     }
 
     // Generate drag (Cd) and lift (Cl) coefficients over the cylinder patch
@@ -79,7 +84,7 @@ functions
         libs            (forces);
 
         // Fluid force and moment on the following patches will be calculated
-        patches         (cylinderWall);
+        patches         (cylinder);
 
         // Only report drag (Cd) and lift (Cl) coefficients and omit others
         coefficients    (Cd Cl);
@@ -121,9 +126,9 @@ functions
         rho             rhoInf; // Indicates incompressible
         rhoInf          1;      // Redundant for incompressible-flow cases
 
-        writeControl    $/writeControl;
-        writeInterval   $/writeInterval;
-        log             on;
+        writeControl    timeStep;
+        writeInterval   1;
+        log             off;
     }
 }
  

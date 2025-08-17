@@ -17,8 +17,18 @@ cd "${0%/*}" || exit    # Run from this directory
 # Source tutorial run functions
 . $WM_PROJECT_DIR/bin/tools/RunFunctions
 
-# Generate the mesh
+# Generate the mesh using blockMesh
 MESH_LEVEL=${MESH_LEVEL} runApplication blockMesh
+
+# Generate the mesh using Gmsh
+#runApplication gmsh -3 -format msh2 -setnumber meshLevel ${MESH_LEVEL} gmsh/oscillatingCylinderInChannel.geo -o gmsh/osc#illatingCylinderInChannel.geo.msh
+#runApplication gmshToFoam gmsh/oscillatingCylinderInChannel.msh
+# mv 0 0.tmp
+#runApplication polyDualMesh 45 -overwrite
+#runApplication combinePatchFaces 45 -overwrite
+#runApplication extrudeMesh
+#runApplication changeDictionary
+# mv 0.tmp 0
 
 if [ "$1" = '-p' ];
 then
