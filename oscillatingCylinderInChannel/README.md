@@ -36,6 +36,7 @@ When the cylinder patch (`cylinder`) begins oscillating, the surrounding
 $$
 \int_{\Omega(t)} \nabla \cdot \mathbf{U} \mathrm{d}V = 0,
 $$
+
 $$
   \frac{\partial}{\partial t} \int_{\Omega(t)} \mathbf{U} \mathrm{d}V
 + \int_{\Omega(t)} \nabla \cdot
@@ -306,6 +307,7 @@ In this case, the `oscillatingLinearMotion` function is applied, causing the
 $$
 \mathbf{X}_{t_n} = \mathbf{X}_{t_0} + \Delta \mathbf{X}_{\mathrm g}(t)
 $$
+
 $$
   \Delta \mathbf{X}_{\mathrm g}(t)
 = \texttt{amplitude} \times \sin(\texttt{omega} \times t)
@@ -557,14 +559,17 @@ $$
                      = 2 \times \pi \times 0.25 \times 0.25
                \approx 0.3927\ \frac{\mathrm{m}}{\mathrm{s}},
 $$
+
 $$
 p_{\text{dyn}} = \frac{1}{2} \rho_{\infty} \mathbf{U}_\infty^2
                 = 0.5 \times 1.0 \times (0.3927)^2
           \approx 0.0771\ \mathrm{Pa},
 $$
+
 $$
 A_{\text{ref}} = L_{\text{ref}} L_z = 0.1 \times 0.1 = 0.01 \mathrm{m}^2,
 $$
+
 $$
 \texttt{forceScaling} = \frac{1}{A_{\text{ref}} p_{\text{dyn}}}
                       = \frac{1}{0.01 \times 0.0771}
@@ -578,6 +583,7 @@ the total fluid forces (in the $x$- and $y$-directions) acting
 $$
 C_{\mathrm{d}} = \texttt{forceScaling}\ F_x,
 $$
+
 $$
 C_{\mathrm{l}} = \texttt{forceScaling}\ F_y.
 $$
