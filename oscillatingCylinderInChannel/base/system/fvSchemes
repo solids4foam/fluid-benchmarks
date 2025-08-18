@@ -38,6 +38,7 @@ gradSchemes
     default none;
     grad(U) leastSquaresS4f;
     grad(p) leastSquaresS4f;
+    grad(pcorr) leastSquaresS4f;
     grad(D) leastSquaresS4f;
     //grad(Phi) leastSquares;
     //cellLimited leastSquaresS4f;
