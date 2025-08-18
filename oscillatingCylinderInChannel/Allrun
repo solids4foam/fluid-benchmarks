@@ -181,7 +181,7 @@ do
             if [[ ! -f "${BLOCKMESHDICT}" ]]
             then
                 printf "Cannot find %s/%s: please add it to %s/system/\n\n" \
-                       "${CASE}" "${BLOCKMESH}" "${BASE}" >&2
+                       "${CASE}" "${BLOCKMESHDICT}" "${BASE}" >&2
                 exit 1
             fi
 
