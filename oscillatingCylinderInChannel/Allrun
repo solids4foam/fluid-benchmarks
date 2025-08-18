@@ -68,7 +68,7 @@ readonly configs
 # `${BASE}/gmsh/oscillatingCylinderInChannel.geo` for the triangular and
 # polyhedral meshes
 declare -i START_MESH=1
-declare -i END_MESH=2
+declare -i END_MESH=6
 readonly START_MESH END_MESH
 
 # Check mesh level range is valid.
@@ -221,6 +221,10 @@ do
         if (( PIMPLEFLUID == 1 ))
         then
             FLUID_MODEL="pimpleFluid"
+
+            # Replace fvSolution
+            echo "cp system/fvSolution.newtonIcoFluid system/fvSolution"
+            \cp system/fvSolution.newtonIcoFluid system/fvSolution
         fi
 
         # 4. Run, log and profile the solver
