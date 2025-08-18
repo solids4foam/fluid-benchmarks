@@ -24,10 +24,10 @@ boundaryField
 {
     ".*"
     {
-        // newMovingWallVelocity implements boundary non-orthogonal corrections,
-        // which are required for second-order accuracy
+        // `newMovingWallVelocity` implements boundary non-orthogonal
+        // corrections, which are required for second-order accuracy.
         // Note that the moving wall condition reduces to a noSlip condition for
-        // stationary wall
+        // stationary wall.
         type            newMovingWallVelocity;
         value           uniform (0 0 0);
     }
