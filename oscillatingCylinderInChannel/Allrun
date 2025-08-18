@@ -198,12 +198,10 @@ do
 
                 if [[ "$MESH" == "POLY" ]]
                 then
-                    mv 0 0.tmp
                     runApplication polyDualMesh 45 -overwrite
                     runApplication combinePatchFaces 45 -overwrite
                     runApplication extrudeMesh
                     runApplication changeDictionary
-                    mv 0.tmp 0
                 fi
 
                 runApplication createPatch -overwrite
@@ -233,6 +231,8 @@ do
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         # Set the log file name
         LOG="log.solids4Foam.${FLUID_MODEL}"
+
+        restore0Dir
 
         # Run the solver
         # If "gtime" is available (could be called "time" on Linux), use it to

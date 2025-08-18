@@ -68,8 +68,6 @@ case "${MESH}" in
 
         if [[ "${MESH}" == "POLY" ]]
         then
-            mv 0 0.tmp
-
             # Convert to polyhedral mesh
             runApplication polyDualMesh 45 -overwrite
 
@@ -82,8 +80,6 @@ case "${MESH}" in
 
             # Assign boundary patches proper type
             runApplication changeDictionary
-
-            mv 0.tmp 0
         fi
 
         # Merge `front` and `back` patches into one patch: `frontAndBack`
@@ -96,6 +92,8 @@ case "${MESH}" in
         exit 1
         ;;
 esac
+
+restore0Dir
 
 if [ "$1" = '-p' ];
 then
