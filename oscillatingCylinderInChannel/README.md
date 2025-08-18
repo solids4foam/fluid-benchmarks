@@ -218,17 +218,20 @@ Coefficients for `pimpleFluid` can also be specified in the
 
 ## Initial Mesh
 
-Two types of meshes can be generated: structured hexagonal mesh (`POLYHEDRAL=0`)
- and unstructured polyhedral mesh (`POLYHEDRAL=1`). Structured mesh can be
- either uniform (`GRADED=0`) or graded (`GRADED=1`).
+Four types of meshes can be generated:
+
+- structured quadrilateral uniform mesh (`MESH=QUAD`),
+- structured quadrilateral graded mesh (`MESH=QUAD_GRADED`),
+- unstructured triangular mesh (`MESH=TRI`),
+- unstructured polyhedral mesh (`MESH=POLY`).
 
 As an example, uniform and graded structured hexagonal grids at three different
  mesh density levels are shown in the following figures:
 
 ![Various mesh density levels of the uniform structured mesh: (a) `MESH_LEVEL=1`, (b) `MESH_LEVEL=2`, (c) `MESH_LEVEL=3`.](./images/structured_uniform_hex_meshes.png)
 
-An example of unstructured graded polyhedral mesh generated using Gmsh, and
- other OpenFOAM mesh manipulation utilities, is shown in the following figure:
+An example of unstructured polyhedral mesh generated using Gmsh, and other
+ OpenFOAM mesh manipulation utilities, is shown in the following figure:
 
 ![An example of unstructured graded polyhedral mesh.](./images/unstructured_graded_poly_mesh.png)
 
