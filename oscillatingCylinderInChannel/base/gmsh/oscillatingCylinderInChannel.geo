@@ -4,12 +4,15 @@
 // The "meshLevel" can be set as a command line option,
 // > gmsh -3 -format msh2 -setnumber meshLevel 2.0 oscillatingCylinderInChannel.geo
 // A larger value corresponds to a finer mesh
+// Increasing the meshLevel by 1.0 corresponds to halving the average mesh
+// spacing, i.e., this will increase the number of cells by a factor of 4 (as
+// this is a 2-D case)
 If (!Exists(meshLevel))
   meshLevel = 1.0; // default value
 EndIf
 
 // Set the global scale factor
-sf = 2.0 / meshLevel;
+sf = 2.0 / Pow(2.0, meshLevel);
 
 //--------------------------------------------------
 // Geometry parameters
