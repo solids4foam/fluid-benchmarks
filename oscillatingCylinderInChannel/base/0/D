@@ -24,41 +24,41 @@ boundaryField
 {
     cylinder
     {
+#if 1
         type            fixedDisplacement;
         displacementSeries
         {
-            file    "$FOAM_CASE/constant/timeVsDisplacement";
+            file        "$FOAM_CASE/constant/timeVsDisplacement";
             outOfBounds clamp;
         }
-
-        // code
-        // #{
-        //     const scalar x0 = 1.0;
-        //     const scalar A = 0.25;
-        //     const scalar f = 0.25;
-        //     const scalar twoPiF = 2.0*constant::mathematical::pi*f;
-        //     const scalar t = db().time().value();
-        //     const vector x(x0 + A*sin(twoPiF*t), 0.0, 0.0);
-        //     operator==(x);
-        // #};
-
+#else
+        name    D_cylinder;
+        type    codedFixedValue;
+        code
+        #{
+            constexpr scalar x0 = 1.1; // [m]
+            constexpr scalar A = 0.25; // [m]
+            constexpr scalar f = 0.25; // [Hz]
+            constexpr scalar omega = constant::mathematical::twoPi*f; // [rad/s]
+            const scalar t = db().time().value();
+            const vector x(x0 + A*sin(omega*t), 0.0, 0.0);
+            operator==(x);
+        #};
+#endif
         value           uniform (0 0 0);
     }
+
     "left|right"
     {
         type            fixedDisplacement;
         value           uniform (0 0 0);
     }
+
     "up|down"
     {
-        //type            symmetry;
-        // type            fixedDisplacement;
         type            slip;
-        // type            fixedDisplacementZeroShear;
-        //forceZeroShearGrad yes;
-        //type            fixedValue;
-        value           uniform (0 0 0);
     }
+
     frontAndBack
     {
         type            empty;
