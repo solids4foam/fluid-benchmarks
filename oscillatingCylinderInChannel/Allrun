@@ -193,21 +193,36 @@ do
         then
             if command -v gmsh &> /dev/null
             then
-                runApplication gmsh -3 -format msh2 -setnumber meshLevel ${mesh_level} gmsh/oscillatingCylinderInChannel.geo
+                # Generate the mesh using Gmsh
+                runApplication gmsh -3 -format msh2 -setnumber \
+                    meshLevel ${mesh_level} \
+                    gmsh/oscillatingCylinderInChannel.geo
+
+                # Convert Gmsh mesh to OpenFOAM format
                 runApplication gmshToFoam gmsh/oscillatingCylinderInChannel.msh
 
                 if [[ "$MESH" == "POLY" ]]
                 then
+                    # Convert to polyhedral mesh
                     runApplication polyDualMesh 45 -overwrite
+
+                    # Combine faces into larger polygons so that the angle
+                    # between edges is less than 45 degrees.
                     runApplication combinePatchFaces 45 -overwrite
+
+                    # Extrude the 2D mesh into 3D from `back` to `front`
                     runApplication extrudeMesh
+
+                    # Assign boundary patches proper type
                     runApplication changeDictionary
                 fi
 
+                # Merge `front` and `back` patches into one patch:
+                # `frontAndBack`
                 runApplication createPatch -overwrite
             else
                 echo "gmsh not found: please install it"
-                exit 1                
+                exit 1
             fi
         else
             echo "Unknown mesh type: ${MESH}"
@@ -232,6 +247,7 @@ do
         # Set the log file name
         LOG="log.solids4Foam.${FLUID_MODEL}"
 
+        # Restore the 0/ directory from 0.orig/
         restore0Dir
 
         # Run the solver
