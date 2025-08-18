@@ -19,6 +19,7 @@
 :     "${MESH:=QUAD}"
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 cd "${0%/*}" || exit    # Run from this directory
+set -e
 
 # Source tutorial run functions
 . $WM_PROJECT_DIR/bin/tools/RunFunctions
