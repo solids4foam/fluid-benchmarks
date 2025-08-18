@@ -205,6 +205,8 @@ do
                     runApplication changeDictionary
                     mv 0.tmp 0
                 fi
+
+                runApplication createPatch -overwrite
             else
                 echo "gmsh not found: please install it"
                 exit 1                

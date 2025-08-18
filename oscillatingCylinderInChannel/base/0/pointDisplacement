@@ -37,11 +37,7 @@ boundaryField
         type            slip;
         value           uniform (0 0 0);
     }
-    front
-    {
-        type            empty;
-    }
-    back
+    frontAndBack
     {
         type            empty;
     }

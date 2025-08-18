@@ -28,6 +28,7 @@ MESH_LEVEL=${MESH_LEVEL} runApplication blockMesh
 #runApplication combinePatchFaces 45 -overwrite
 #runApplication extrudeMesh
 #runApplication changeDictionary
+#runApplication createPatch -overwrite
 # mv 0.tmp 0
 
 if [ "$1" = '-p' ];
