@@ -12,7 +12,7 @@ If (!Exists(meshLevel))
 EndIf
 
 // Set the global scale factor
-sf = 2.0 / Pow(2.0, meshLevel);
+sf = 2.0 / (2.0 ^ meshLevel);
 
 //--------------------------------------------------
 // Geometry parameters
