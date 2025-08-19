@@ -506,7 +506,6 @@ Plotting these errors on a log-log plot demonstrates that second-order is
  large displacement and rotations, Journal of Computational Physics 255,
  660–679](https://doi.org/10.1016/j.jcp.2013.08.038)
 
-<!-- markdown-link-check-disable -->
 [^cardiff2025]: [Cardiff, P., Armfield, D., Tuković, Ž. and Batistić, I. (2025).
  Implementing a Jacobian-free Newton-Krylov method in OpenFOAM Applications to
  solids fluids and fluid-solid interaction, 20th OpenFOAM Workshop, Vienna,
