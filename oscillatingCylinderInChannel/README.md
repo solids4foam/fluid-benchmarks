@@ -1,38 +1,35 @@
-# The Flow Past an Oscillating Circular Cylinder in a Channel
+# Flow Past an Oscillating Circular Cylinder in a Channel
 
 ---
 
 ## Tutorial Aims
 
-- Benchmarks the accuracy of the `newtonIcoFluid` coupled Newton-Raphson fluid
-  solver against the numerical solution of the flow past an oscillating cylinder
-  case.
+- Benchmark the accuracy of the `newtonIcoFluid` coupled Newton-Raphson fluid
+  solver for flow around an oscillating cylinder case.
 
 ---
 
 ## Case Overview
 
-Wan \& Turek[^wan2006] provided a numerical solution for the 2-D,
+Wan and Turek[^wan2006] provided a numerical solution for the 2-D,
  incompressible, laminar, viscous flow past a circular cylinder that oscillates
- sinusoidally in an enclosed channel. The case is well-suited for benchmarking
- the accuracy of a discretization.
+ sinusoidally in an enclosed channel, where the mesh undergoes large motion.
 
 ### Solution Domain
 
-The rectangular channel has a domain $[0, 2.2] \times [0, 0.41] \mathrm{m}^2$,
- and the cylinder is initially located at $(1.1, 0.2) \mathrm{m}$ with respect
- to the lower left corner of the domain.
+The rectangular channel has a domain $[0, 2.2] \times [0, 0.41] \; \mathrm{m}$,
+ and the cylinder is initially located at $(1.1, 0.2)\; \mathrm{m}$ with respect
+ to the lower left corner of the domain (figure below).
 
 ![Domain and dimensions](./images/domain_dimensions.png)
 
 ### Governing Equations
 
 When the cylinder patch (`cylinder`) begins oscillating, the surrounding
- mesh deforms, and the volume of individual cells change throughout the
- simulation. Consequently, we can no longer assume $\mathrm{d}V / \mathrm{d}t =
- 0$ in the governing equations. The continuity and momentum equations therefore
- take the following forms:
-
+ mesh deforms, and the volume of individual cells changes throughout the
+ simulation. To deal with the moving mesh, an arbitrary Lagrangian-Eulerian
+ (ALE) approach is adopted. The continuity and momentum equations in arbitrary Lagrangian-Eulerian
+ form are:
 $$
 \int_{\Omega(t)} \nabla \cdot \mathbf{U} \mathrm{d}V = 0,
 $$
@@ -49,8 +46,9 @@ $$
 where $\mathbf{U}$ denotes the fluid velocity, $p$ is the kinematic pressure,
  $\nu$ is the kinematic viscosity of the fluid, $\rho$ represents the fluid
  density, and $\mathbf{U}_{\mathrm g}$ is the grid (mesh) velocity. The grid
- velocity $\mathbf{U}_g$ is obtained by solving the **Space Conservation Law
- (SCL)**, also known as the **Grid Conservation Law (GCL)**:
+ velocity $\mathbf{U}_g$ is obtained using a pseudo-solid approach, where the
+ volume swept by the internal faces is calculated in a way that the space conservation
+ law, also known as the grid conservation law, is automatically satisfied:
 
 $$
 \frac{\partial}{\partial t} \int_{\Omega(t)} \mathrm{d}V
@@ -58,66 +56,66 @@ $$
 $$
 
 ```note
-The above formulation is known as the Arbitrary Lagrangian–Eulerian (ALE)
- formulation. If $\mathbf{U}_{\mathrm{g}} = 0$, we recover the Eulerian
- description (static mesh). If $\mathbf{U}_{\mathrm{g}} = \mathbf{U}$, we obtain
- the Lagrangian description (mesh moves with fluid particles). Any other case
- corresponds to the ALE description.
+In the Arbitrary Lagrangian–Eulerian formulation, if $\mathbf{U}_{\mathrm{g}} = 0$,
+ we recover the Eulerian description (static mesh). If
+ $\mathbf{U}_{\mathrm{g}} = \mathbf{U}$, we obtain the Lagrangian description
+ (mesh moves with fluid particles). Any other case corresponds to the ALE
+ description.
 ```
 
 ### Cylinder (Boundary) Motion
 
 The displacement of points on the `cylinder` patch, with an initial cylinder
  center at $(x_0, y_0) = (1.1, 0.2)$ (relative to the lower-left corner of the
- domain), is given by:
-
+ domain), are given by:
 $$
-\mathbf{x}_{\mathrm cyl}
-\= \left(x_{\mathrm{cyl}_0} + A \sin(\omega t)\right) \mathbf{i}
-\+ y_{{\mathrm cyl}_0} \mathbf{j},
+\mathbf{x}_{\mathrm{cyl}}
+\= \left(\mathbf{x}_{\mathrm{cyl}_0}^x + A \sin(\omega t)\right) \mathbf{i}
+\+ \mathbf{x}_{{\mathrm cyl}_0}^y \mathbf{j},
 $$
 
-where $t$ is time, $A = 0.25 \mathrm m$ is the oscillation amplitude, $\omega =
- 2\pi f$ is the angular velocity, $f = 0.25 \mathrm Hz$ is the oscillation
+where $t$ is time, $A = 0.25\; \mathrm m$ is the oscillation amplitude, $\omega =
+ 2\pi f$ is the angular velocity, $f = 0.25\; \mathrm Hz$ is the oscillation
  frequency, and $\mathbf{x}_{{\mathrm cyl}_0}$ is the initial location points on
- the `cylinder` patch. This motion is specified in the `0/pointsDisplacement`
- file.
+ the `cylinder` patch, where $\mathbf{x}_{\mathrm{cyl}_0}^x $ and
+ $\mathbf{x}_{\mathrm{cyl}_0}^y $ are its $x$ and $y$ components respectively.
+ This motion is specified in the `0/D` file.
 
 ### Boundary condition
 
-A no-slip boundary condition, $\mathbf{U} = \mathbf{0} \mathrm{m/s}$, and a
- zero-pressure-gradient condition, ${\partial p}/{\partial n} = 0$, are applied
- on all solid surfaces. The fluid is initially at rest $\mathbf{U}_0 =
- \mathbf{0} \mathrm{m/s}$. As all pressure boundaries are of gradient type, the
- pressure field is defined up to a constant. To deal with this in the current
- case, the pressure in one cell of the domain, close to the point specified by
- the dictionary entry `system/fvSolution.PIMPLE.pRefPoint`, is fixed to $0
- \mathrm{Pa}$.
+A no-slip moving wall boundary condition, $\mathbf{U} = \mathbf{\bar{U}}\; \mathrm{m/s}$,
+ and a zero-pressure-gradient condition, ${\partial p}/{\partial n} = 0$, are applied
+ on all solid surfaces, where $\mathbf{\bar{U}} = \mathbf{0}$ on the outer
+ boundaries and is given as the velocity of the mesh motion on the cylinder.
+ The fluid is initially at rest $\mathbf{U}_0 = \mathbf{0}\; \mathrm{m/s}$. As
+ all pressure boundaries are of gradient type, the pressure field is defined up
+ to a constant. To deal with this in the current case, the pressure in one cell
+ of the domain, close to the point specified by the dictionary entry `system/fvSolution.PIMPLE.pRefPoint`,
+ is fixed to $0\; \mathrm{Pa}$.
 
-The `left` and `right` patches are assigned a fixed-value zero point
- displacement, i.e., _no-slip_, $\mathbf{x}_{\mathrm{g}} = \mathbf{0}
- \mathrm{m}$ while the `up` and `down` patches use a _slip_ boundary condition,
- which constrains motion in the normal direction, $\mathbf{x}_{\mathrm{g}} \cdot
- \mathbf{n} = 0 \mathrm{m}$, while allowing tangential displacement with the
- same displacement as the nearest interior cell, satisfying ${\partial
- (\mathbf{x}_g \cdot \mathbf{t})}/{\partial n} = 0$.
+The `left` and `right` patches are assigned a zero
+ displacement condition, while the `up` and `down` patches use a _slip_ boundary
+ condition, which constrains motion in the normal direction,
+ $\mathbf{x}_{\mathrm{g}} \cdot \mathbf{n} = 0 \; \mathrm{m}$, while allowing
+ tangential displacement with the same displacement as the nearest interior cell,
+ satisfying ${\partial (\mathbf{x}_g \cdot \mathbf{t})}/{\partial n} = 0$, where
+ $\mathbf{x}_g$ represents the coordinate of a point on the patch.
 
 ![Initial and boundary conditions](./images/initial_and_boundary_condition.png)
 
-The slip boundary condition preserves the initial orthogonality and minimizes
+The slip boundary condition preserves the initial orthogonality and minimises
  mesh skewness during the cylinder's horizontal oscillations: the `up` and
  `down` boundaries allow tangential sliding, while the mesh to the left and
  right of the cylinder undergoes compression and expansion like an accordion,
  preventing excessive distortion and maintaining quality throughout the domain.
- For example, the following figure shows a structured hexagonal mesh
- (`MESH_LEVEL=2`) at time $t = 3.00 \mathrm{s}$, which corresponds to the
- farthest cylinder can move toward left, as $\sin(2 \pi f t) = -1$ .
-
+ For example, the figure below shows a structured quadrilateral mesh
+ (`MESH_LEVEL=2`) at time $t = 3.00 \;\mathrm{s}$, which corresponds to the
+ farthest cylinder can move toward the left ($\sin(2 \pi f t) = -1$ ).
 $$
-  x_{\text{cell}}\big|_{t=3.0\mathrm s}
+x_{\text{cell}}\big|_{t=3.0\mathrm s}
 = A \sin(2 \pi f t)
 = 0.25 \times \sin(2 \times 0.25 \times \pi \times 3 )
-= -0.25 \mathrm{m}
+= -0.25 \;\mathrm{m}
 $$
 
 At this instance of time, and similarly at $t = 9.00 \mathrm{s}$, the mesh has
@@ -126,30 +124,35 @@ At this instance of time, and similarly at $t = 9.00 \mathrm{s}$, the mesh has
 ![Slip boundary condition](./images/mesh_t_3.00s.png)
 
 Also, note that since the `cylinder` patch is moving, we need to use the motion
- boundary condition, `movingWallVelocity`, in the `0/U` file.
+ boundary condition, `newMovingWallVelocity`, in the `0/U` file.
 
 ```{.cpp .numberLines}
 boundaryField
 {
     cylinder
     {
-        type            movingWallVelocity;
+        type            newMovingWallVelocity;
         value           uniform (0 0 0);
     }
 ...
 ```
 
+```note
+Note that newMovingWallVelocity is a version of movingWallVelocity, where
+ boundary non-orthogonal corrections are included.
+```
+
 ### Constant Properties
 
-The fluid is Newtonian and its kinematic viscosity, $\nu = \mu / \rho = 1 \times
+The fluid is Newtonian with the kinematic viscosity, $\nu = \mu / \rho = 1 \times
  10^{-3} \mathrm{m}^2/\mathrm{s}$, and density, $\rho = 1
- \mathrm{kg}/\mathrm{m}^3$, (needed by `newtonIcoFluid` fluid model) is
+ \mathrm{kg}/\mathrm{m}^3$, (needed by `newtonIcoFluid` fluid model)
  specified in `constant/transportProperties`
 
 ```foam
 transportModel  Newtonian;
 
-rho             rho [1 -3 0 0 0 0 0] 1; // Required by newtonIcoFluid
+rho             rho [1 -3 0 0 0 0 0] 1;
 nu              nu  [0 2 -1 0 0 0 0] 1e-3;
 ```
 
@@ -201,29 +204,29 @@ newtonIcoFluidCoeffs
 ```
 
 ```note
-Coefficients for `pimpleFluid` can also be specified in the
+Coefficients for `pimpleFluid` should be specified in the
  `system/fvSolution.PIMPLE` dictionary.
 ```
 
 ```tip
 `${FLUID_MODEL:-newtonIcoFluid}` uses shell parameter expansion, meaning it will
- insert the value of the environment variable `FLUID_MODEL` if it's set and
- non-empty, or fall back to `newtonIcoFluid` if its unset or empty. This allows
- us to set `fluidModel` dynamically without editing the file and by simply
- setting the environment variable before running the case, e.g.,
- `FLUID_MODEL=pimpleFluid solids4Foam` or `FLUID_MODEL=pimpleFluid ./Allrun`
+ insert the value of the environment variable `FLUID_MODEL` if it's non-empty,
+ or fall back to `newtonIcoFluid` if empty. This allows us to set `fluidModel`
+ dynamically without editing the file and by simply setting the environment
+ variable before running the case, e.g., `FLUID_MODEL=pimpleFluid solids4Foam` or
+ `FLUID_MODEL=pimpleFluid ./Allrun`
 ```
 
 ---
 
 ## Initial Mesh
 
-Four types of meshes can be generated:
+Four types of meshes are availabe in the case:
 
-- structured quadrilateral uniform mesh (`MESH=QUAD`),
-- structured quadrilateral graded mesh (`MESH=QUAD_GRADED`),
-- unstructured triangular mesh (`MESH=TRI`),
-- unstructured polyhedral mesh (`MESH=POLY`).
+- Structured quadrilateral uniform mesh (`MESH=QUAD`),
+- Structured quadrilateral graded mesh (`MESH=QUAD_GRADED`),
+- Unstructured triangular mesh (`MESH=TRI`),
+- Unstructured polyhedral mesh (`MESH=POLY`).
 
 As an example, uniform and graded structured hexagonal grids at three different
  mesh density levels are shown in the following figures:
@@ -231,8 +234,8 @@ As an example, uniform and graded structured hexagonal grids at three different
 ![Various mesh density levels of the uniform structured mesh: (a) `MESH_LEVEL=1`,
  (b) `MESH_LEVEL=2`, (c) `MESH_LEVEL=3`.](./images/structured_uniform_hex_meshes.png)
 
-An example of unstructured polyhedral mesh generated using Gmsh, and other
- OpenFOAM mesh manipulation utilities, is shown in the following figure:
+An example of an unstructured polyhedral mesh generated using a combination of
+ Gmsh and `polyDualMesh` is shown below.
 
 ![An example of unstructured graded polyhedral mesh.](./images/unstructured_graded_poly_mesh.png)
 
@@ -240,10 +243,9 @@ An example of unstructured polyhedral mesh generated using Gmsh, and other
 
 ## Mesh Motion
 
-Dynamics of mesh is specified in `constant/dynamicMeshDict`, where the type of
- dynamic mesh is set to `dynamicMotionSolverFvMesh`, which uses a mesh motion
- solver to compute the mesh motion based on a prescribed motion, which in this
- case is the inline sinusoidal oscillation of the `cylinder` boundary patch.
+The dynamics mesh details are specified in `constant/dynamicMeshDict`, where
+ the type of  dynamic mesh is set to `dynamicMotionSolverFvMesh`, which uses a
+ mesh motion solver to compute the mesh motion based on a prescribed motion.
 
 ```foam
 dynamicFvMesh       dynamicMotionSolverFvMesh;
@@ -251,128 +253,89 @@ motionSolverLibs    (fvMotionSolvers);
 ```
 
 In this case, among other mesh motion solvers implemented in OpenFOAM, we use
- `displacementLaplacian`, a diffusion-based solver that smoothly propagates
- motion throughout the domain.
+ `solids4foamSolidModel`, which is a pseudo-solid mesh motion from the
+ solids4foam toolbox.
 
 ```foam
-motionSolver        displacementLaplacian;
+motionSolver        solids4foamSolidModel;
 ```
 
-It solves the following Laplace equation for cell displacement
- (`cellDisplacement`) field (stored at cell centers),
-
-$$
-\nabla \cdot \left( \Gamma \nabla (\Delta \mathbf{X}_{\text{cell}}) \right) = 0,
-$$
-
-where $\Delta \mathbf{X}_{\text{cell}}$ is the cell displacement field
- (`cellDisplacement`) and $\Gamma$ is the motion diffusivity (scalar) field.
-
-`displacementLaplacian` interpolates the cell displacement at cell centers to
- mesh points to obtain the grid point displacement field, $\Delta
- \mathbf{X}_{\mathrm g}$, and computes new positions based on the initial
- points, $\mathbf{X}_{t_0}$. It then moves the grid points to these new
- locations. This solver smoothly propagates prescribed motion at boundaries or
- within mesh zones to the rest of the domain, preventing skewed or tangled
- cells.
-
-$\Gamma$ determines how the motion of the boundary patch is distributed
- throughout the domain. The value for diffusivity is determined by specifying a
- diffusivity model via the `displacementLaplacianCoeffs.diffusivity` dictionary
- entry.
+It solves a pseudo-solid equation for cell displacement
+ (`cellDisplacement`) field (stored at cell centers), where the stiffness field
+ is scaled by the _diffusivity_ (scalar) field. The diffusivity field determines
+ how the motion of the boundary patch is distributed throughout the domain. The
+ value for diffusivity is determined by specifying a diffusivity model via the
+ `constant/meshMotionFluid/mechanicalProperties` dictionary:
 
 ```foam
-displacementLaplacianCoeffs
-{
-    diffusivity     inverseDistance (cylinder);
-}
+mechanical
+(
+    fluidMesh
+    {
+        type        diffusionHyperElastic;
+        rho         rho [1 -3 0 0 0 0 0] 1;
+        mu          mu [1 -1 -2 0 0 0 0] 1;
+        K           K [1 -1 -2 0 0 0 0] 4;
+        regionName  meshMotionFluid;
+        diffusivity inverseDistance (cylinder);
+        writeStiffScaleFactor no;
+    }
+);
 ```
 
 In this case we use the `inverseDistance` model which calculates diffusivity
  based on inverse distance to given patches, which in this case is the
  `cylinder` patch. This means that mesh points farther away from the cylinder
- patch are deformed less.
+ patch are deformed more, while the cells near to the cylinder act stiffer and
+ deform less, this preserving their quality.
 
-Finally, as we have selected the `displacementLaplacian` motion solver, the
- prescribed motion of the boundary patch `cylinder` must be set up in the
- `0/pointDisplacement` file.
+As we have selected the `solids4foamSolidModel` motion solver, the
+boundary conditions for the mesh displacement field should be presribed in `0/D`.
+ The `cylinder` displacement is specified as a time series using the `fixedDisplacement`
+ boundary condition:
 
-Since the oscillation of cylinder is a rigid body motion,
- `solidBodyMotionDisplacement` is used as the motion boundary type. This
- specifies all points move together without deformation. This condition allows
- the use of a predefined _solid body motion function_ to set fixed
- displacements.
-
-In this case, the `oscillatingLinearMotion` function is applied, causing the
- patch to oscillate back and forth along a straight line with a given
- _amplitude_ (`amplitude`) and _angular velocity_ (`omega`), as defined in the
- `oscillatingLinearMotionCoeffs` dictionary:
-
-$$
-\mathbf{X}_{t_n} = \mathbf{X}_{t_0} + \Delta \mathbf{X}_{\mathrm g}(t)
-$$
-
-$$
-  \Delta \mathbf{X}_{\mathrm g}(t)
-= \texttt{amplitude} \times \sin(\texttt{omega} \times t)
-$$
-
-```foam
-boundaryField
-{
+```c++
     cylinder
     {
-        type                    solidBodyMotionDisplacement;
-        solidBodyMotionFunction oscillatingLinearMotion;
-
-        // \Delta X = amplitude*sin(omega*t)
-        oscillatingLinearMotionCoeffs
+        type            fixedDisplacement;
+        displacementSeries
         {
-            // Amplitude (x-direction) of displacement oscillations [m]
-            Ax              0.25;
-            // Frequency of displacement oscillations [Hz]
-            f               0.25;
-
-            // Amplitude vector [m]
-            amplitude       ($Ax 0 0);
-
-            // Angular velocity of oscillations [rad/s]
-            omega           ${{ 2*pi()*$f }};
+            file        "$FOAM_CASE/constant/timeVsDisplacement";
+            outOfBounds clamp;
         }
     }
-    ...
-}
 ```
 
-```note
-`Ax` and `f` are user-defined variables here; they are not OpenFOAM keywords but
- are used to calculate `amplitude` and `omega`.
-```
+The `timeVsDisplacement` is generated using the provided `constant/generateTimeVsDisplacement.py`
+ Python script:
 
-Alternatively, the function can be implemented manually using a
- `codedFixedValue` boundary condition:
+```python
+#!/usr/bin/env python3
+import numpy as np
 
-```foam
-boundaryField
-{
-    cylinder
-    {
-        name    pointDisplacement_cylinder;
-        type    codedFixedValue;
-        code
-        #{
-            using constant::mathematical::twoPi;
+# Parameters
+A = 0.25        # amplitude
+f = 0.25        # frequency [Hz]
+t0 = 0.0        # start time
+end_time = 25.0 # end time
+delta_t = 0.005 # time step
+x0 = 0.0        # initial displacement
 
-            constexpr scalar Ax = 0.25;     // Amplitude [m]
-            constexpr scalar f  = 0.25;     // Frequency [Hz]
-            constexpr scalar omega = twoPi*f;
+# Time vector
+time = np.arange(t0, end_time + delta_t, delta_t)
 
-            const scalar t = this->db().time().value();
-            operator==(Ax*sin(omega*t)*vector(1, 0, 0));
-        #};
-        value   $internalField;
-    }
-    ...
+# Displacement (only x-component varies)
+displacement = x0 + A * np.sin(2 * np.pi * f * time)
+
+# Write output
+outfile = "timeVsDisplacement"
+with open(outfile, "w") as file:
+    file.write("(\n")
+    for ti, xi in zip(time, displacement):
+        file.write(f"    ( {ti:.3f} ( {xi:.6f} 0 0 ))\n")
+    file.write(")\n")
+
+print(f"Data written to '{outfile}' with {len(time)} entries.")
 ```
 
 For the `left` and `right` patches, a no-slip boundary condition is applied,
@@ -382,61 +345,16 @@ For the `left` and `right` patches, a no-slip boundary condition is applied,
 boundaryField
 {
     ...
-    slipWalls
+    "left|right"
+    {
+        type    fixedDisplacement;
+        value   (0 0 0);
+    }
+    "up|down"
     {
         type    slip;
     }
-
-    noSlipWalls
-    {
-        type    fixedValue;
-        value   $internalField;
-    }
 ...
-```
-
----
-
-## Numerics
-
-A linear solver must be specified for `cellDisplacement` in `system/fvSolution`,
-
-```foam
-solvers
-{
-    ...
-    "cellDisplacement|cellDisplacementFinal"
-    {
-        solver      GAMG;
-        tolerance   1e-6;
-        relTol      0;
-        smoother    GaussSeidel;
-    }
-}
-```
-
-Also, the Laplacian term in the mesh motion Laplace equation,
- `laplacian(diffusivity, cellDisplacement)`, requires a discretization scheme:
-
-```foam
-// system/fvSchemes
-...
-laplacianSchemes
-{
-    ...
-    laplacian(diffusivity,cellDisplacement) Gauss linear corrected;
-}
-```
-
-The implicit first order `backward` scheme is used for time derivatives,
-
-```foam
-// system/fvSchemes
-...
-ddtSchemes
-{
-    default backward;
-}
 ```
 
 ---
@@ -485,25 +403,34 @@ The `oscillatingCylinderInChannel/Allrun` script runs multiple cases based on th
 ```bash
 # Define configurations as space-separated strings
 configs=(
-    "BASE=base NAME=hex.uniform.lu.pimpleFluid GRADED=0 PIMPLEFLUID=1"
+    "BASE=base NAME=poly.newtonIcoFluid MESH=POLY PIMPLEFLUID=0"
 )
+readonly configs
+# Description
+#     BASE:            name of the base template case
+#     NAME:            base name given to each case that is created
+#     MESH:            Create a structured quadrilaterial (QUAD or QUAD_GRADED)
+#                      mesh, a triangular mesh (TRI) or a polygonal mesh (POLY)
+#                      mesh
+#     PIMPLEFLUID:     use the pimpleFluid (1) or the newtonIcoFluid (0) models
+#
 # Example
 # configs=(
-#     "BASE=base NAME=hex.uniform.lu.newtonIcoFluid GRADED=0 PIMPLEFLUID=0"
-#     "BASE=base NAME=hex.uniform.lu.pimpleFluid    GRADED=0 PIMPLEFLUID=1"
-#     "BASE=base NAME=hex.graded.lu.newtonIcoFluid  GRADED=1 PIMPLEFLUID=0"
-#     "BASE=base NAME=hex.graded.lu.pimpleFluid     GRADED=1 PIMPLEFLUID=1"
+#     "BASE=base NAME=poly.newtonIcoFluid MESH=POLY PIMPLEFLUID=0"
+#     "BASE=base NAME=hex.graded.pimpleFluid MESH=QUAD_GRADED PIMPLEFLUID=1"
 # )
 
 # Mesh level (density) range (integer).
 declare -i START_MESH=1
 declare -i END_MESH=1
+
+# ...
 ```
 
 The `Allrun` script automates the setup, execution, and post-processing of the
  cases. It creates a unique run directory, iterates over predefined case
  configurations and mesh refinement levels, generates the mesh using the
- appropriate `blockMeshDict` (uniform or graded), and selects the fluid model
+ `blockMesh` or Gmsh, and selects the fluid model
  (`newtonIcoFluid` or `pimpleFluid`). Simulations are then run in serial
  (`PARALLEL=0`) or parallel (`PARALLEL=1`), while performance metrics are logged
  using some version of `time` utility. Finally, plots of the force coefficients
@@ -514,7 +441,7 @@ The `Allrun` script automates the setup, execution, and post-processing of the
 The contour plots at four different time instances, together with the reference
  calculations of Wan and Turek[^wan2006] and Erzincanli et al.[^erzincanli2013],
  show that the $x$-component of the velocity reaches higher magnitudes when the
- cylinder passes through the channel center ($x = 1.1 \mathrm m$). Furthermore,
+ cylinder passes through the channel center ($x = 1.1 \;\mathrm m$). Furthermore,
  vortices are formed near the channel corners as well as along the upper and
  lower walls.
 
@@ -523,7 +450,7 @@ The contour plots at four different time instances, together with the reference
 To compre quantitatively the drag coefficient, $C_{\mathrm d}$, and the lift
  coefficient, $C_{\mathrm l}$, are evaluated against the results reported by Wan
  and Turek[^wan2006]. The comparison shows that the present numerical results
- are virtually identical to those in the reference study.
+ are visually indistinguishable from those in Wan and Turek[^wan2006].
 
 <!-- ![TODO(abzrg): ADD FIGURE: DRAG COEFFICIENT PLOT](placeholder) -->
 
@@ -531,9 +458,8 @@ To compre quantitatively the drag coefficient, $C_{\mathrm d}$, and the lift
 
 ### Function Objects for Calculating Forces and Force Coefficients
 
-In this 2-D problem, the $x$-axis is defined as the drag direction, with the
+The $x$-axis is defined as the drag direction, with the
  drag coefficient given by
-
 $$
   C_{\mathrm d}
 = \frac{2 F_x}{\rho_\infty \mathbf{U}_\infty^2 L_{\text{ref}} L_z},
@@ -561,7 +487,7 @@ Performing a simple calculation,
 $$
 |\mathbf{U}_\infty| = 2 \pi f A_{\text{ref}}
                      = 2 \times \pi \times 0.25 \times 0.25
-               \approx 0.3927\ \frac{\mathrm{m}}{\mathrm{s}},
+               \approx 0.3927\ \mathrm{m}\,\mathrm{s}^{-1},
 $$
 
 $$
@@ -592,7 +518,7 @@ $$
 C_{\mathrm{l}} = \texttt{forceScaling}\ F_y.
 $$
 
-The following function objects are employed:
+To calculate these forces and coefficients, function objects are employed:
 
 - `forces`: computes the three components of the fluid force (and moments) on
   specified patches (here, the `cylinder` patch).
@@ -620,9 +546,9 @@ functions
         // Center of rotation (required for moment calculation)
         CofR            (0 0 0);
 
-        writeControl    $/writeControl;
-        writeInterval   $/writeInterval;
-        log             on;
+        writeControl    1;
+        writeInterval   1;
+        log             off;
     }
 
     // Generate drag (Cd) and lift (Cl) coefficients over the cylinder patch
@@ -674,9 +600,9 @@ functions
         rho             rhoInf; // Indicates incompressible
         rhoInf          1;      // Redundant for incompressible-flow cases
 
-        writeControl    $/writeControl;
-        writeInterval   $/writeInterval;
-        log             on;
+        writeControl    1;
+        writeInterval   1;
+        log             off;
     }
 }
 ```
@@ -696,14 +622,10 @@ The outputs of these function objects are written to the directory
 
 ## References
 
-[^erzincanli2013]: Erzincanli, B. and Sahin, M. (2013). An arbitrary Lagrangian
- –Eulerian formulation for solving moving boundary problems with large
- displacement and rotations. Journal of Computational Physics 255, 660–679.
- [doi:10.1016/j.jcp.2013.08.038][erzdoi]
-
-[^wan2006]: Wan, D. and Turek S. (2006). Fictitious Boundary and Moving Mesh
+[^wan2006]: [Wan, D. and Turek S. (2006). Fictitious Boundary and Moving Mesh
  Methods for the Numerical Simulation of Rigid Particulate Flows. Journal of
- Computational Physics 222, 28–56. [doi:10.1016/j.jcp.2006.06.002][wanddoi]
+ Computational Physics 222, 28–56.](https://doi:10.1016/j.jcp.2006.06.002)
 
-[erzdoi]: https://doi.org/10.1016/j.jcp.2013.08.038
-[wanddoi]: https://doi.org/10.1016/j.jcp.2006.06.002
+[^erzincanli2013]: [Erzincanli, B. and Sahin, M. (2013). An arbitrary Lagrangian
+ –Eulerian formulation for solving moving boundary problems with large
+ displacement and rotations. Journal of Computational Physics 255, 660–679.](https://doi:10.1016/j.jcp.2013.08.038)
