@@ -689,52 +689,21 @@ The chosen solver computes these quantities on the fly; however, if the outputs
 
 The outputs of these function objects are written to the directory
  `${FOAM_CASE}/postProcessing`. The results from the `forces` function object
- are stored in `${FOAM_CASE}/postProcessing/forces/0/force.dat`.
-
-```text
-# Force
-# CofR        : (0.000000e+00 0.000000e+00 0.000000e+00)
-#
-# Time         total_x total_y total_z pressure_x pressure_y pressure_z viscous_x viscous_y viscous_z
-0              0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
-0.05           -2.709748e-03 -1.493331e-06 1.944949e-17 -1.465068e-03 -1.562898e-06 -7.852772e-24 -1.244680e-03 6.956685e-08 1.944950e-17
-0.1            -2.133667e-03 -2.701745e-07 2.053873e-17 -1.208474e-03 -5.441286e-07 -1.770222e-24 -9.251935e-04 2.739541e-07 2.053873e-17
-0.15           -1.894662e-03 1.459948e-06 2.002129e-17 -1.113101e-03 9.418997e-07 -8.019142e-24 -7.815611e-04 5.180485e-07 2.002129e-17
-0.2            -1.731550e-03 3.531304e-06 1.845445e-17 -1.042044e-03 2.733282e-06 -5.158365e-24 -6.895061e-04 7.980211e-07 1.845446e-17
-0.25           -1.582285e-03 5.763382e-06 1.936889e-17 -9.643504e-04 4.593245e-06 -5.142667e-24 -6.179341e-04 1.170136e-06 1.936889e-17
-0.3            -1.427006e-03 7.947220e-06 2.056651e-17 -8.723496e-04 6.353267e-06 -3.578061e-24 -5.546561e-04 1.593953e-06 2.056651e-17
-```
-
-and output of the `forceCoeffs` function is stored in
- `${FOAM_CASE}/postProcessing/forceCoeffs/0/coefficient.dat`.
-
-```text
-# Force and moment coefficients
-# dragDir     : (1.000000e+00 0.000000e+00 0.000000e+00)
-# sideDir     : (0.000000e+00 0.000000e+00 -1.000000e+00)
-# liftDir     : (0.000000e+00 1.000000e+00 0.000000e+00)
-# rollAxis    : (1.000000e+00 0.000000e+00 0.000000e+00)
-# pitchAxis   : (0.000000e+00 0.000000e+00 -1.000000e+00)
-# yawAxis     : (0.000000e+00 1.000000e+00 0.000000e+00)
-# magUInf     : 3.926991e-01
-# lRef        : 1.000000e-01
-# Aref        : 1.000000e-02
-# CofR        : (0.000000e+00 0.000000e+00 0.000000e+00)
-#
-# Time         Cd             Cl
-0              0.000000e+00 0.000000e+00
-0.05           -3.514302e+00 -1.936717e-03
-0.1            -2.767177e+00 -3.503923e-04
-0.15           -2.457208e+00 1.893423e-03
-0.2            -2.245667e+00 4.579787e-03
-0.25           -2.052082e+00 7.474594e-03
-0.3            -1.850700e+00 1.030684e-02
-```
+  are stored in `${FOAM_CASE}/postProcessing/forces/0/force.dat`, and output of
+  the `forceCoeffs` function is stored in `${FOAM_CASE}/postProcessing/forceCoeffs/0/coefficient.dat`.
 
 ---
 
 ## References
 
-[^erzincanli2013]: [Erzincanli, B. and Sahin, M. (2013). An arbitrary Lagrangian–Eulerian formulation for solving moving boundary problems with large displacement and rotations, Journal of Computational Physics 255,  660–679](https://doi.org/10.1016/j.jcp.2013.08.038)
+[^erzincanli2013]: Erzincanli, B. and Sahin, M. (2013). *An arbitrary Lagrangian
+ –Eulerian formulation for solving moving boundary problems with large
+ displacement and rotations*. Journal of Computational Physics 255, 660–679.
+ [doi:10.1016/j.jcp.2013.08.038][erzdoi]
 
-[^wan2006]: [Wan, D. and Turek S. (2006). Fictitious Boundary and Moving Mesh Methods for the Numerical Simulation of Rigid Particulate Flows, Journal of Computational Physics 222, 28-56](https://doi.org/10.1016/j.jcp.2006.06.002)
+[^wan2006]: Wan, D. and Turek S. (2006). *Fictitious Boundary and Moving Mesh
+ Methods for the Numerical Simulation of Rigid Particulate Flows*. Journal of
+ Computational Physics 222, 28–56. [doi:10.1016/j.jcp.2006.06.002][wanddoi]
+
+[erzdoi]: https://doi.org/10.1016/j.jcp.2013.08.038
+[wanddoi]: https://doi.org/10.1016/j.jcp.2006.06.002
