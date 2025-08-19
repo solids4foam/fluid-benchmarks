@@ -518,16 +518,16 @@ The contour plots at four different time instances, together with the reference
  vortices are formed near the channel corners as well as along the upper and
  lower walls.
 
-![TODO(abzrg): ADD FIGURE: CONTOUR PLOT AND STREAM TRACES](placeholder)
+<!-- ![TODO(abzrg): ADD FIGURE: CONTOUR PLOT AND STREAM TRACES](placeholder) -->
 
 To compre quantitatively the drag coefficient, $C_{\mathrm d}$, and the lift
  coefficient, $C_{\mathrm l}$, are evaluated against the results reported by Wan
  and Turek[^wan2006]. The comparison shows that the present numerical results
  are virtually identical to those in the reference study.
 
-![TODO(abzrg): ADD FIGURE: DRAG COEFFICIENT PLOT](placeholder)
+<!-- ![TODO(abzrg): ADD FIGURE: DRAG COEFFICIENT PLOT](placeholder) -->
 
-![TODO(abzrg): ADD FIGURE: LIFT COEFFICIENT PLOT](placeholder)
+<!-- ![TODO(abzrg): ADD FIGURE: LIFT COEFFICIENT PLOT](placeholder) -->
 
 ### Function Objects for Calculating Forces and Force Coefficients
 
