@@ -24,10 +24,14 @@ pimpleFluidCoeffs
 newtonIcoFluidCoeffs
 {
     // Pressure stabilisation
-    omega     [0 -2 1 0 0 0 0] 100;
-    localReRef      1e6;
-    omegaExponent   1.0;
-    alphaU          1.0;
+    stabilisation
+    {
+        type        RhieChow;
+        scaleFactor 1.0;
+
+        // type        laplacian;
+        // omega       [0 -2 1 0 0 0 0] 100;
+    }
 
     // Set the pressure to zero at the centre cell
     pRefPoint       (0.5 0.2 0);
