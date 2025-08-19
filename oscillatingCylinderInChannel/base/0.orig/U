@@ -11,40 +11,32 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       pointVectorField;
-    object      pointDisplacement;
+    class       volVectorField;
+    object      U;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 1 0 0 0 0 0];
+dimensions      [0 1 -1 0 0 0 0];
 
 internalField   uniform (0 0 0);
 
 boundaryField
 {
-    cylinder
+    ".*"
     {
-        type            calculated;
+        // `newMovingWallVelocity` implements boundary non-orthogonal
+        // corrections, which are required for second-order accuracy.
+        // Note that the moving wall condition reduces to a noSlip condition for
+        // stationary wall.
+        type            newMovingWallVelocity;
         value           uniform (0 0 0);
     }
-    "left|right"
-    {
-        type            fixedValue;
-        value           uniform (0 0 0);
-    }
-    "up|down"
-    {
-        type            slip;
-        value           uniform (0 0 0);
-    }
-    front
-    {
-        type            empty;
-    }
-    back
+
+    frontAndBack
     {
         type            empty;
     }
 }
+
 
 // ************************************************************************* //

@@ -11,8 +11,8 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       volVectorField;
-    object      D;
+    class       pointVectorField;
+    object      pointDisplacement;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -24,46 +24,23 @@ boundaryField
 {
     cylinder
     {
-        type            fixedDisplacement;
-        displacementSeries
-        {
-            file    "$FOAM_CASE/constant/timeVsDisplacement";
-            outOfBounds clamp;
-        }
-
-        // code
-        // #{
-        //     const scalar x0 = 1.0;
-        //     const scalar A = 0.25;
-        //     const scalar f = 0.25;
-        //     const scalar twoPiF = 2.0*constant::mathematical::pi*f;
-        //     const scalar t = db().time().value();
-        //     const vector x(x0 + A*sin(twoPiF*t), 0.0, 0.0);
-        //     operator==(x);
-        // #};
-
+        type            calculated;
         value           uniform (0 0 0);
     }
+
     "left|right"
     {
-        type            fixedDisplacement;
+        type            fixedValue;
         value           uniform (0 0 0);
     }
+
     "up|down"
     {
-        //type            symmetry;
-        // type            fixedDisplacement;
         type            slip;
-        // type            fixedDisplacementZeroShear;
-        //forceZeroShearGrad yes;
-        //type            fixedValue;
         value           uniform (0 0 0);
     }
-    front
-    {
-        type            empty;
-    }
-    back
+
+    frontAndBack
     {
         type            empty;
     }

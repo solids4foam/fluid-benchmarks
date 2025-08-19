@@ -181,7 +181,7 @@ do
             if [[ ! -f "${BLOCKMESHDICT}" ]]
             then
                 printf "Cannot find %s/%s: please add it to %s/system/\n\n" \
-                       "${CASE}" "${BLOCKMESH}" "${BASE}" >&2
+                       "${CASE}" "${BLOCKMESHDICT}" "${BASE}" >&2
                 exit 1
             fi
 
@@ -193,21 +193,36 @@ do
         then
             if command -v gmsh &> /dev/null
             then
-                runApplication gmsh -3 -format msh2 -setnumber meshLevel ${mesh_level} gmsh/oscillatingCylinderInChannel.geo
+                # Generate the mesh using Gmsh
+                runApplication gmsh -3 -format msh2 -setnumber \
+                    meshLevel ${mesh_level} \
+                    gmsh/oscillatingCylinderInChannel.geo
+
+                # Convert Gmsh mesh to OpenFOAM format
                 runApplication gmshToFoam gmsh/oscillatingCylinderInChannel.msh
 
                 if [[ "$MESH" == "POLY" ]]
                 then
-                    mv 0 0.tmp
+                    # Convert to polyhedral mesh
                     runApplication polyDualMesh 45 -overwrite
+
+                    # Combine faces into larger polygons so that the angle
+                    # between edges is less than 45 degrees.
                     runApplication combinePatchFaces 45 -overwrite
+
+                    # Extrude the 2D mesh into 3D from `back` to `front`
                     runApplication extrudeMesh
+
+                    # Assign boundary patches proper type
                     runApplication changeDictionary
-                    mv 0.tmp 0
                 fi
+
+                # Merge `front` and `back` patches into one patch:
+                # `frontAndBack`
+                runApplication createPatch -overwrite
             else
                 echo "gmsh not found: please install it"
-                exit 1                
+                exit 1
             fi
         else
             echo "Unknown mesh type: ${MESH}"
@@ -231,6 +246,9 @@ do
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         # Set the log file name
         LOG="log.solids4Foam.${FLUID_MODEL}"
+
+        # Restore the 0/ directory from 0.orig/
+        restore0Dir
 
         # Run the solver
         # If "gtime" is available (could be called "time" on Linux), use it to

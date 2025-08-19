@@ -24,19 +24,21 @@ boundaryField
 {
     ".*"
     {
-        // fixedGradientCorrected employs non-orthogonal corrections
-        // which are required to achieve second-order accuracy on grids with
-        // boundary non-orthogonality
+#if 1
+        // `fixedGradientCorrected` employs non-orthogonal corrections which are
+        // required to achieve second-order accuracy on grids with
+        // boundary non-orthogonality.
         type            fixedGradientCorrected;
         gradient        uniform 0;
-
-        // zeroGradient does NOT employ non-orthogonal corrections and hence
+#else
+        // `zeroGradient` does NOT employ non-orthogonal corrections and hence
         // will approach zero-order accuracy for grids which contain boundary
-        // non-orthogonality in the limit of mesh refinement
-        // type            zeroGradient;
+        // non-orthogonality in the limit of mesh refinement.
+        type            zeroGradient;
+#endif
     }
 
-    "frontAndBack|front|back"
+    frontAndBack
     {
         type            empty;
     }
