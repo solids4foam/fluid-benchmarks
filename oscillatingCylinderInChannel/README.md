@@ -696,13 +696,13 @@ The outputs of these function objects are written to the directory
 
 ## References
 
-[^erzincanli2013]: Erzincanli, B. and Sahin, M. (2013). *An arbitrary Lagrangian
+[^erzincanli2013]: Erzincanli, B. and Sahin, M. (2013). An arbitrary Lagrangian
  –Eulerian formulation for solving moving boundary problems with large
- displacement and rotations*. Journal of Computational Physics 255, 660–679.
+ displacement and rotations. Journal of Computational Physics 255, 660–679.
  [doi:10.1016/j.jcp.2013.08.038][erzdoi]
 
-[^wan2006]: Wan, D. and Turek S. (2006). *Fictitious Boundary and Moving Mesh
- Methods for the Numerical Simulation of Rigid Particulate Flows*. Journal of
+[^wan2006]: Wan, D. and Turek S. (2006). Fictitious Boundary and Moving Mesh
+ Methods for the Numerical Simulation of Rigid Particulate Flows. Journal of
  Computational Physics 222, 28–56. [doi:10.1016/j.jcp.2006.06.002][wanddoi]
 
 [erzdoi]: https://doi.org/10.1016/j.jcp.2013.08.038
