@@ -17,12 +17,18 @@ sf = 2.0 / (2.0 ^ meshLevel);
 //--------------------------------------------------
 // Geometry parameters
 //--------------------------------------------------
-x1 = -1.1;
-x2 =  1.1;
-y1 = -0.2;
-y2 =  0.21;
-r  =  0.05;
-z  =  0.1;
+
+// Cylinder centre and radius
+x0 = 1.1;
+y0 = 0.2;
+r  = 0.05;
+
+// Domain bounds
+x1 = 0.0;
+x2 = 2.2;
+y1 = 0.0;
+y2 = 0.41;
+z  = 0.1;
 
 //--------------------------------------------------
 // Mesh size parameters
@@ -49,11 +55,11 @@ Line(4) = {4, 1};
 //--------------------------------------------------
 // Cylinder
 //--------------------------------------------------
-Point(5) = {0, 0, 0, cylinderDeltaX};
-Point(6) = { r, 0, 0, cylinderDeltaX};
-Point(7) = {0,  r, 0, cylinderDeltaX};
-Point(8) = {-r, 0, 0, cylinderDeltaX};
-Point(9) = {0, -r, 0, cylinderDeltaX};
+Point(5) = {x0, y0, 0, cylinderDeltaX};
+Point(6) = {x0 + r, y0, 0, cylinderDeltaX};
+Point(7) = {x0, y0 + r, 0, cylinderDeltaX};
+Point(8) = {x0 - r, y0, 0, cylinderDeltaX};
+Point(9) = {x0, y0 - r, 0, cylinderDeltaX};
 
 Circle(5) = {6, 5, 7};
 Circle(6) = {7, 5, 8};
