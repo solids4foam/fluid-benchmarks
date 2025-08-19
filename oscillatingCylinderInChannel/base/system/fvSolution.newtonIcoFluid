@@ -87,11 +87,13 @@ PIMPLE
 relaxationFactors
 {}
 
-// Cache gradients for pimpleFluid
-cache
-{
-    grad(U);
-    grad(p);
-}
+// We should not try to cache the gradients when using newtonIcoFluid as it
+// already stores the gradients and this will disrupt the object registry
+// cache
+// {
+//     grad(U);
+//     grad(p);
+// }
+
 
 // ************************************************************************* //

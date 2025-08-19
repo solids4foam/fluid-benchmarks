@@ -16,40 +16,48 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+d2dt2Schemes
+{
+    default    none;
+    d2dt2(D)   steadyState;
+}
+
 ddtSchemes
 {
-    default backward;
+    default    none;
+    d2dt2(D)   steadyState;
+    ddt(D)     steadyState;
+    ddt(U)     backward;
+    ddt(p)     backward;
 }
 
 gradSchemes
 {
-    default leastSquares;
+    default none;
+    grad(U) leastSquaresS4f;
+    grad(p) leastSquaresS4f;
+    grad(pcorr) leastSquaresS4f;
+    grad(D) leastSquaresS4f;
 }
 
 divSchemes
 {
-    default             none;
-    div(U)              Gauss linear;
-    div(phi,U)          Gauss linearUpwind grad(U);
-    div(devRhoReff)     Gauss linear;
+    default none;
     jacobian-div(phi,U) Gauss upwind;
-    div((nuEff*dev2(T(grad(U)))))   Gauss linear;
+    div(phi,U)      Gauss linearUpwind grad(U);
+    div((nuEff*dev2(T(grad(U))))) Gauss linear;
+    div(devRhoReff) Gauss linear;
+    div(U) Gauss linear;
 }
 
 laplacianSchemes
 {
-    default                 Gauss linear limited corrected 1;
-    laplacian(nuEff,U)      Gauss linear corrected;
-    laplacian((1|A(U)),p)   Gauss linear corrected;
-    laplacian(rAU,p)        Gauss linear corrected;
-    laplacian(diffusivity,cellMotionU)      Gauss linear corrected;
-    laplacian(diffusivity,cellDisplacement) Gauss linear corrected;
+    default Gauss linear corrected;
 }
 
 interpolationSchemes
 {
     default linear;
-    interpolate(U)  skewCorrected linear;
 }
 
 snGradSchemes
@@ -63,5 +71,9 @@ fluxRequired
     p;
 }
 
+wallDist
+{
+    method          exactDistance;
+}
 
 // ************************************************************************* //

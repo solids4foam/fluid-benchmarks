@@ -11,18 +11,32 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       dictionary;
-    object      dynamicMeshDict;
+    class       volVectorField;
+    object      U;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dynamicFvMesh   dynamicMotionSolverFvMesh;
+dimensions      [0 1 -1 0 0 0 0];
 
-solver          solids4foamSolidModel;
+internalField   uniform (0 0 0);
 
-solids4foamSolidModelCoeffs
+boundaryField
 {
-    regionName      meshMotionFluid;
+    ".*"
+    {
+        // `newMovingWallVelocity` implements boundary non-orthogonal
+        // corrections, which are required for second-order accuracy.
+        // Note that the moving wall condition reduces to a noSlip condition for
+        // stationary wall.
+        type            newMovingWallVelocity;
+        value           uniform (0 0 0);
+    }
+
+    frontAndBack
+    {
+        type            empty;
+    }
 }
+
 
 // ************************************************************************* //

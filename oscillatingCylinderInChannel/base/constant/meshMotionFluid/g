@@ -11,18 +11,13 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       dictionary;
-    object      dynamicMeshDict;
+    class       uniformDimensionedVectorField;
+    location    "constant";
+    object      g;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dynamicFvMesh   dynamicMotionSolverFvMesh;
-
-solver          solids4foamSolidModel;
-
-solids4foamSolidModelCoeffs
-{
-    regionName      meshMotionFluid;
-}
+dimensions      [0 1 -2 0 0 0 0];
+value           ( 0 0 0 );
 
 // ************************************************************************* //

@@ -1,0 +1,5 @@
+fixedGradientCorrected/fixedGradientCorrectedFvPatchVectorField.C
+fixedGradientCorrected/fixedGradientCorrectedFvPatchScalarField.C
+patchCorrectionVectors.C
+
+LIB = $(FOAM_USER_LIBBIN)/libcorrectedFvPatchVectorField

@@ -11,18 +11,39 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       dictionary;
-    object      dynamicMeshDict;
+    class       pointVectorField;
+    object      pointDisplacement;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dynamicFvMesh   dynamicMotionSolverFvMesh;
+dimensions      [0 1 0 0 0 0 0];
 
-solver          solids4foamSolidModel;
+internalField   uniform (0 0 0);
 
-solids4foamSolidModelCoeffs
+boundaryField
 {
-    regionName      meshMotionFluid;
+    cylinder
+    {
+        type            calculated;
+        value           uniform (0 0 0);
+    }
+
+    "left|right"
+    {
+        type            fixedValue;
+        value           uniform (0 0 0);
+    }
+
+    "up|down"
+    {
+        type            slip;
+        value           uniform (0 0 0);
+    }
+
+    frontAndBack
+    {
+        type            empty;
+    }
 }
 
 // ************************************************************************* //

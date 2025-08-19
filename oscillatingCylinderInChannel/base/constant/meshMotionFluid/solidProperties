@@ -12,17 +12,33 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
-    object      dynamicMeshDict;
+    object      solidProperties;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dynamicFvMesh   dynamicMotionSolverFvMesh;
+//solidModel    linearGeometryTotalDisplacement;
+//solidModel    nonLinearGeometryTotalLagrangianTotalDisplacement;
+//solidModel    diffusionSolid;
+solidModel    nonLinearGeometryTotalLagrangianTotalDisplacement;
 
-solver          solids4foamSolidModel;
-
-solids4foamSolidModelCoeffs
+"diffusionSolidCoeffs|linearGeometryTotalDisplacementCoeffs|nonLinearGeometryTotalLagrangianTotalDisplacementCoeffs"
 {
-    regionName      meshMotionFluid;
+    // Solution algorithm
+    //solutionAlgorithm implicitSegregated;
+    solutionAlgorithm PETScSNES;
+    //solutionAlgorithm explicit;
+
+    // PETSc options file used by PETScSNES
+    optionsFile petscOptions.lu;
+
+    // Predictor D at the start of a new time step using U and A
+    //predictor yes;
+
+    stabilisation
+    {
+        type    RhieChow;
+        scaleFactor 1.0;
+    }
 }
 
 // ************************************************************************* //

@@ -12,17 +12,25 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
-    object      dynamicMeshDict;
+    location    "system";
+    object      createPatchDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dynamicFvMesh   dynamicMotionSolverFvMesh;
+pointSync false;
 
-solver          solids4foamSolidModel;
+patches
+(
+    {
+        name frontAndBack;
 
-solids4foamSolidModelCoeffs
-{
-    regionName      meshMotionFluid;
-}
+        patchInfo
+        {
+            type empty;
+        }
 
-// ************************************************************************* //
+        constructFrom patches;
+
+        patches (front back);
+    }
+);
