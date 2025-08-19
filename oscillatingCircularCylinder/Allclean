@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-cd "${0%/*}" || exit    # Run from this directory
-
-echo "Removing all run directories"
-find . -maxdepth 1 -name 'run_*' -type d -print0 | xargs --null rm -rfv
