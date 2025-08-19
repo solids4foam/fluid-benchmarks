@@ -90,7 +90,7 @@ relaxationFactors
 // Cache gradients for pimpleFluid
 cache
 {
-    grad(U);
+    //grad(U); // already stored in fluidModel
     grad(p);
 }
 
