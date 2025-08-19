@@ -1,0 +1,25 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{C,H}]
+indent_style = space
+indent_size = 4
+max_line_length = 80
+
+[All{run,clean,runWithLogging}]
+indent_style = space
+indent_size = 4
+max_line_length = 80
+
+[*.{gnuplot,gpi,plt,gp}]
+indent_style = space
+indent_size = 4
+max_line_length = 80
+
+[*.{md,txt}]
+trim_trailing_whitespace = false
