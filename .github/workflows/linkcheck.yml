@@ -19,3 +19,5 @@ jobs:
       uses: gaurav-nelson/github-action-markdown-link-check@1.0.15
       with:
         use-verbose-mode: 'yes'
+        config-file: '.markdown_linkcheck_config.json'
+ 

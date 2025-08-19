@@ -27,8 +27,6 @@ ddtSchemes
     default    none;
     d2dt2(D)   steadyState;
     ddt(D)     steadyState;
-    //ddt(U)     Euler;
-    //ddt(p)     Euler;
     ddt(U)     backward;
     ddt(p)     backward;
 }
@@ -38,22 +36,18 @@ gradSchemes
     default none;
     grad(U) leastSquaresS4f;
     grad(p) leastSquaresS4f;
+    grad(pcorr) leastSquaresS4f;
     grad(D) leastSquaresS4f;
 }
 
 divSchemes
 {
     default none;
-
-    // Don't use "bounded" as it is zero order accurate!!
-    // div(phi,U)      bounded Gauss linearUpwind grad(U);
-    div(phi,U)      Gauss linearUpwind grad(U);
-
     jacobian-div(phi,U) Gauss upwind;
-
-    div(U) Gauss linear;
+    div(phi,U)      Gauss linearUpwind grad(U);
     div((nuEff*dev2(T(grad(U))))) Gauss linear;
     div(devRhoReff) Gauss linear;
+    div(U) Gauss linear;
 }
 
 laplacianSchemes
@@ -79,9 +73,7 @@ fluxRequired
 
 wallDist
 {
-    // method          meshWave;
     method          exactDistance;
-    //nRequired       yes;
 }
 
 // ************************************************************************* //

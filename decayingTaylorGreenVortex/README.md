@@ -510,5 +510,4 @@ Plotting these errors on a log-log plot demonstrates that second-order is
 [^cardiff2025]: [Cardiff, P., Armfield, D., Tuković, Ž. and Batistić, I. (2025).
  Implementing a Jacobian-free Newton-Krylov method in OpenFOAM Applications to
  solids fluids and fluid-solid interaction, 20th OpenFOAM Workshop, Vienna,
- Austria. July 2025](https://www.researchgate.net/publication/393352391_Implementing_a_Jacobian-free_Newton-Krylov_method_in_OpenFOAM_Applications_to_solids_fluids_and_fluid-solid_interaction)
-<!-- markdown-link-check-enable -->
+ Austria. July 2025](https://doi.org/10.13140/RG.2.2.35692.48009)
