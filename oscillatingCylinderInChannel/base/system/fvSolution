@@ -87,12 +87,11 @@ PIMPLE
 relaxationFactors
 {}
 
-// cache gradients for pimpleFluid
+// Cache gradients for pimpleFluid
 cache
 {
     grad(U);
     grad(p);
 }
-
 
 // ************************************************************************* //

@@ -24,7 +24,7 @@ pimpleFluidCoeffs
 newtonIcoFluidCoeffs
 {
     // Pressure stabilisation
-    omega     [0 -2 1 0 0 0 0] 1;
+    omega     [0 -2 1 0 0 0 0] 100;
     localReRef      1e6;
     omegaExponent   1.0;
     alphaU          1.0;
@@ -37,6 +37,5 @@ newtonIcoFluidCoeffs
     optionsFile     petscOptions.pcsplit2D;
     //optionsFile     petscOptions.lu;
 }
-
 
 // ************************************************************************* //

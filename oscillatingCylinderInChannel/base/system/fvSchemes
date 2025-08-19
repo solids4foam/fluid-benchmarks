@@ -27,8 +27,6 @@ ddtSchemes
     default    none;
     d2dt2(D)   steadyState;
     ddt(D)     steadyState;
-    // ddt(U)     Euler;
-    // ddt(p)     Euler;
     ddt(U)     backward;
     ddt(p)     backward;
 }
@@ -40,24 +38,15 @@ gradSchemes
     grad(p) leastSquaresS4f;
     grad(pcorr) leastSquaresS4f;
     grad(D) leastSquaresS4f;
-    //grad(Phi) leastSquares;
-    //cellLimited leastSquaresS4f;
 }
 
 divSchemes
 {
     default none;
-    // div(phi,U) Gauss linearUpwind cellLimited leastSquares 1;
-
     jacobian-div(phi,U) Gauss upwind;
-    //div(phi,U)          Gauss upwind;
-    //div(phi,U) Gauss linear;
     div(phi,U)      Gauss linearUpwind grad(U);
-
     div((nuEff*dev2(T(grad(U))))) Gauss linear;
-    // div((nuEff*dev(T(grad(U))))) Gauss linear;
     div(devRhoReff) Gauss linear;
-
     div(U) Gauss linear;
 }
 
@@ -69,7 +58,6 @@ laplacianSchemes
 interpolationSchemes
 {
     default linear;
-    //interpolate(U) skewCorrected linear;
 }
 
 snGradSchemes
@@ -85,9 +73,7 @@ fluxRequired
 
 wallDist
 {
-    // method          meshWave;
     method          exactDistance;
-    //nRequired       yes;
 }
 
 // ************************************************************************* //

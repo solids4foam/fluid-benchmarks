@@ -16,13 +16,12 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-//dynamicFvMesh staticFvMesh;
-
 dynamicFvMesh   dynamicMotionSolverFvMesh;
+
 solver          solids4foamSolidModel;
+
 solids4foamSolidModelCoeffs
 {
-    // regionName      region0;
     regionName      meshMotionFluid;
 }
 

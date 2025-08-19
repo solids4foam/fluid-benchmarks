@@ -68,7 +68,7 @@ readonly configs
 # `${BASE}/gmsh/oscillatingCylinderInChannel.geo` for the triangular and
 # polyhedral meshes
 declare -i START_MESH=1
-declare -i END_MESH=6
+declare -i END_MESH=2
 readonly START_MESH END_MESH
 
 # Check mesh level range is valid.
