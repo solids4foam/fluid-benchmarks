@@ -39,11 +39,11 @@ $$
 
 $$
   \frac{\partial}{\partial t} \int_{\Omega(t)} \mathbf{U} \mathrm{d}V
-+ \int_{\Omega(t)} \nabla \cdot
+\+ \int_{\Omega(t)} \nabla \cdot
   \big[\mathbf{U} \otimes (\mathbf{U} - \mathbf{U}_{\mathrm g})\big] \mathrm{d}V
-- \int_{\Omega(t)} \nu \nabla^2 \mathbf{U} \mathrm{d}V
-- \int_{\Omega(t)} \nabla p \mathrm{d}V
-= 0,
+\- \int_{\Omega(t)} \nu \nabla^2 \mathbf{U} \mathrm{d}V
+\- \int_{\Omega(t)} \nabla p \mathrm{d}V
+\= 0,
 $$
 
 where $\mathbf{U}$ denotes the fluid velocity, $p$ is the kinematic pressure,
@@ -54,7 +54,7 @@ where $\mathbf{U}$ denotes the fluid velocity, $p$ is the kinematic pressure,
 
 $$
 \frac{\partial}{\partial t} \int_{\Omega(t)} \mathrm{d}V
-- \int_{\Omega(t)} \nabla \cdot \mathbf{U}_{\mathrm g} \mathrm{d}V = 0.
+\- \int_{\Omega(t)} \nabla \cdot \mathbf{U}_{\mathrm g} \mathrm{d}V = 0.
 $$
 
 ```note
@@ -72,9 +72,9 @@ The displacement of points on the `cylinder` patch, with an initial cylinder
  domain), is given by:
 
 $$
-  \mathbf{x}_{\mathrm cyl}
-= \left(x_{\mathrm{cyl}_0} + A \sin(\omega t)\right) \mathbf{i}
-+ y_{{\mathrm cyl}_0} \mathbf{j},
+\mathbf{x}_{\mathrm cyl}
+\= \left(x_{\mathrm{cyl}_0} + A \sin(\omega t)\right) \mathbf{i}
+\+ y_{{\mathrm cyl}_0} \mathbf{j},
 $$
 
 where $t$ is time, $A = 0.25 \mathrm m$ is the oscillation amplitude, $\omega =
@@ -228,7 +228,8 @@ Four types of meshes can be generated:
 As an example, uniform and graded structured hexagonal grids at three different
  mesh density levels are shown in the following figures:
 
-![Various mesh density levels of the uniform structured mesh: (a) `MESH_LEVEL=1`, (b) `MESH_LEVEL=2`, (c) `MESH_LEVEL=3`.](./images/structured_uniform_hex_meshes.png)
+![Various mesh density levels of the uniform structured mesh: (a) `MESH_LEVEL=1`,
+ (b) `MESH_LEVEL=2`, (c) `MESH_LEVEL=3`.](./images/structured_uniform_hex_meshes.png)
 
 An example of unstructured polyhedral mesh generated using Gmsh, and other
  OpenFOAM mesh manipulation utilities, is shown in the following figure:
@@ -690,7 +691,6 @@ The outputs of these function objects are written to the directory
  `${FOAM_CASE}/postProcessing`. The results from the `forces` function object
  are stored in `${FOAM_CASE}/postProcessing/forces/0/force.dat`.
 
-<!-- markdownlint-disable -->
 ```text
 # Force
 # CofR        : (0.000000e+00 0.000000e+00 0.000000e+00)
@@ -704,7 +704,6 @@ The outputs of these function objects are written to the directory
 0.25           -1.582285e-03 5.763382e-06 1.936889e-17 -9.643504e-04 4.593245e-06 -5.142667e-24 -6.179341e-04 1.170136e-06 1.936889e-17
 0.3            -1.427006e-03 7.947220e-06 2.056651e-17 -8.723496e-04 6.353267e-06 -3.578061e-24 -5.546561e-04 1.593953e-06 2.056651e-17
 ```
-<!-- markdownlint-enable -->
 
 and output of the `forceCoeffs` function is stored in
  `${FOAM_CASE}/postProcessing/forceCoeffs/0/coefficient.dat`.
@@ -736,11 +735,6 @@ and output of the `forceCoeffs` function is stored in
 
 ## References
 
-[^erzincanli2013]: [Erzincanli, B. and Sahin, M. (2013). An arbitrary
- Lagrangian–Eulerian formulation for solving moving boundary problems with
- large displacement and rotations, Journal of Computational Physics 255,
- 660–679](https://doi.org/10.1016/j.jcp.2013.08.038)
+[^erzincanli2013]: [Erzincanli, B. and Sahin, M. (2013). An arbitrary Lagrangian–Eulerian formulation for solving moving boundary problems with large displacement and rotations, Journal of Computational Physics 255,  660–679](https://doi.org/10.1016/j.jcp.2013.08.038)
 
-[^wan2006]: [Wan, D. and Turek S. (2006). Fictitious Boundary and Moving Mesh
-Methods for the Numerical Simulation of Rigid Particulate Flows, Journal of
-Computational Physics 222, 28-56](https://doi.org/10.1016/j.jcp.2006.06.002)
+[^wan2006]: [Wan, D. and Turek S. (2006). Fictitious Boundary and Moving Mesh Methods for the Numerical Simulation of Rigid Particulate Flows, Journal of Computational Physics 222, 28-56](https://doi.org/10.1016/j.jcp.2006.06.002)
