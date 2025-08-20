@@ -1,0 +1,291 @@
+#!/usr/bin/env bash
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+# Allrun
+#     Run the simulation for various configurations (see the `configs` array
+#     below).
+#
+# Arguments
+#     $1
+#         (optional) Path to the run directory (`RUN_DIR`). If the path does not
+#         exist, the script will create it. If the path exists but is not empty,
+#         the script will exit.
+#
+# Environment Variables
+:     "${PARALLEL:=0}"
+#         (optional) If set to 1, the script will run each case in parallel. If
+#         unset or set to any value other than 1, it will run each case in
+#         serial.
+#
+:     "${NUMBER_OF_SUBDOMAINS:=4}"
+#         (optional) Specifies the number of subdomains for `decomposePar`.
+#
+# Examples
+#     $ ./Allrun
+#     $ ./Allrun /path/to/specific/run/directory/
+#     $ PARALLEL=1 ./Allrun
+#     $ PARALLEL=1 NUMBER_OF_SUBDOMAINS=8 ./Allrun
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+cd "${0%/*}" || exit    # Run from this directory
+
+set -e
+
+if [[ -z $WM_PROJECT ]]
+then
+    echo "Please source the OpenFOAM/FOAM bashrc first!"
+    exit 1
+fi
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+# Case configuration settings
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+
+# Define configurations as space-separated strings
+configs=(
+    "BASE=base NAME=hex.uniform.lu.pimpleFluid GRADED=0 PIMPLEFLUID=1"
+)
+readonly configs
+# Description
+#     BASE:            name of the base template case
+#     NAME:            base name given to each case that is created
+#     GRADED:          graded (1) or uniform (0) initial mesh
+#     PIMPLEFLUID:     use the pimpleFluid (1) or the newtonIcoFluid (0) models
+#
+# Example
+# configs=(
+#     "BASE=base NAME=hex.uniform.lu.newtonIcoFluid GRADED=0 PIMPLEFLUID=0"
+#     "BASE=base NAME=hex.uniform.lu.pimpleFluid    GRADED=0 PIMPLEFLUID=1"
+#     "BASE=base NAME=hex.graded.lu.newtonIcoFluid  GRADED=1 PIMPLEFLUID=0"
+#     "BASE=base NAME=hex.graded.lu.pimpleFluid     GRADED=1 PIMPLEFLUID=1"
+# )
+
+# Mesh level (density) range (integer). Higher values correspond to finer
+# meshes. The minimum level is 1 and the maximum level is 8. For finder meshes
+# edit `${BASE}/system/blockMeshDict*`.
+declare -i START_MESH=1
+declare -i END_MESH=2
+readonly START_MESH END_MESH
+
+# Check mesh level range is valid.
+if (( START_MESH < 1 || START_MESH > END_MESH ))
+then
+    printf "Invalid mesh level range: (start=%s)..(end=%s)\n" \
+           "${START_MESH}" "${END_MESH}" >&2
+    exit 1
+fi
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+# Make the run directory
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+
+# Use first argument as the run directory, or create one if not provided
+if [[ -n "$1" ]]
+then
+    RUN_DIR="$1"
+else
+    # Detect the CPU type: we append this to the case name
+    if [[ "$OSTYPE" == 'darwin'* ]]
+    then
+        # macOS
+        CPU_TYPE=$(sysctl -n machdep.cpu.brand_string \
+            | sed 's/[^a-zA-Z0-9]/_/g')
+    elif [[ -f /proc/cpuinfo ]]
+    then
+        # Linux
+        CPU_TYPE=$(grep -m 1 "model name" /proc/cpuinfo \
+            | awk -F': ' '{print $2}' | sed 's/[^a-zA-Z0-9]/_/g')
+    else
+        # Fallback if neither method works
+        CPU_TYPE='Unknown_CPU'
+    fi
+
+    # Current datetime: we append this to the case name
+    DATE_TIME=$(date +%Y%m%d_%H%M%S)
+
+    # Create timestamped working directory for this run
+    RUN_DIR="run_${CPU_TYPE}_${DATE_TIME}"
+fi
+readonly RUN_DIR CPU_TYPE DATE_TIME
+
+# Skip (re)making `RUN_DIR` if it already exists
+if [[ ! -d "${RUN_DIR}" ]]
+then
+    echo "Creating ${RUN_DIR}"
+    mkdir "${RUN_DIR}"
+fi
+
+# Stop if the user provided `RUN_DIR` is not empty
+if (( $(find "${RUN_DIR}" -maxdepth 1 | wc -l) > 1 ))
+then
+    echo "The '${RUN_DIR}' is not empty." \
+         " Please provide a path to an empty run directory," \
+         " or remove the content of '${RUN_DIR}' first." >&2
+    exit 1
+fi
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+# Run the cases
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+source solids4FoamScripts.sh
+
+BENCHMARK_ROOT=$PWD
+echo "Entering ${RUN_DIR}"
+cd "${RUN_DIR}"
+
+# Iterate through configurations
+for config in "${configs[@]}"
+do
+    declare    BASE NAME
+    declare -i GRADED PIMPLEFLUID
+
+    # Parse the configuration string
+    eval ${config}
+
+    printf '\n***************************************'
+    printf '\n* Running configuration:'
+    printf '\n* - %s' ${config}
+    printf '\n***************************************\n'
+
+    # Loop over mesh levels (densities) in each configuration
+    for mesh_level in $(seq "${START_MESH}" "${END_MESH}")
+    do
+        # 1. Prepare the case
+        #~~~~~~~~~~~~~~~~~~~~
+        CASE="${NAME}.${mesh_level}"
+        printf "\nProcessing case: %s\n" "${CASE}"
+
+        cp -r "$BENCHMARK_ROOT/${BASE}" "$CASE"
+        echo "Entering ${CASE}"
+        cd "${CASE}"
+
+        # 2. Create the mesh
+        #~~~~~~~~~~~~~~~~~~~
+        # Set the blockMeshDict
+        BLOCKMESHDICT="system/blockMeshDict"
+
+        if (( GRADED == 1 ))
+        then
+            BLOCKMESHDICT="${BLOCKMESHDICT}.graded"
+        else
+            BLOCKMESHDICT="${BLOCKMESHDICT}.uniform"
+        fi
+
+        if [[ ! -f "${BLOCKMESHDICT}" ]]
+        then
+            printf "Cannot find %s/%s: please add it to %s/system/\n\n" \
+                   "${CASE}" "${BLOCKMESH}" "${BASE}" >&2
+            exit 1
+        fi
+
+        echo "Using ${BLOCKMESHDICT} with mesh level $mesh_level"
+
+        MESH_LEVEL="${mesh_level}" \
+            solids4Foam::runApplication blockMesh -dict "${BLOCKMESHDICT}"
+
+        # 3. Select and set up the fluid model
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        FLUID_MODEL="newtonIcoFluid"
+
+        if (( PIMPLEFLUID == 1 ))
+        then
+            FLUID_MODEL="pimpleFluid"
+        fi
+
+        # 4. Run, log and profile the solver
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # Set the log file name
+        LOG="log.solids4Foam.${FLUID_MODEL}"
+
+        # Run the solver
+        # If "gtime" is available (could be called "time" on Linux), use it to
+        # record the max memory usage
+        export DYLD_LIBRARY_PATH="${DYLD_LIBRARY_PATH}:${FOAM_LIBBIN}:${FOAM_USER_LIBBIN}"
+        TIME_FORMAT="Elapsed: %E\nMaximum resident set size (kbytes): %M"
+        if (( PARALLEL == 1 ))
+        then
+            # Decompose mesh
+            NUMBER_OF_SUBDOMAINS=${NUMBER_OF_SUBDOMAINS} \
+                solids4Foam::runApplication decomposePar
+
+            # Run in parallel
+            if command -v gtime &> /dev/null
+            then
+                printf "Running %s (%s processes) on %s with gtime\n" \
+                    "${FLUID_MODEL}" "${NUMBER_OF_SUBDOMAINS}" "${CASE}"
+                FLUID_MODEL="${FLUID_MODEL}" \
+                    gtime -f "${TIME_FORMAT}" \
+                    mpirun -np "${NUMBER_OF_SUBDOMAINS}" \
+                    solids4Foam -parallel &> "${LOG}"
+            elif command -v time &> /dev/null
+            then
+                printf "Running %s (%s processes) on %s with time\n" \
+                    "${FLUID_MODEL}" "${NUMBER_OF_SUBDOMAINS}" "${CASE}"
+                FLUID_MODEL="${FLUID_MODEL}" \
+                    command time -f "${TIME_FORMAT}" \
+                    mpirun -np "${NUMBER_OF_SUBDOMAINS}" \
+                    solids4Foam -parallel &> "${LOG}"
+            else
+                printf "Running %s (%s processes) on %s with (bash) time\n" \
+                    "${FLUID_MODEL}" "${NUMBER_OF_SUBDOMAINS}" "${CASE}"
+                FLUID_MODEL="${FLUID_MODEL}" \
+                    time \
+                    mpirun -np "${NUMBER_OF_SUBDOMAINS}" \
+                    solids4Foam -parallel &> "${LOG}"
+            fi
+
+            # Deconstruct the result
+            solids4Foam::runApplication reconstructPar -no-fields -latestTime
+        else
+            if command -v gtime &> /dev/null
+            then
+                printf "Running %s on %s with gtime\n" \
+                    "${FLUID_MODEL}" "${CASE}"
+                FLUID_MODEL="${FLUID_MODEL}" \
+                    gtime -f "${TIME_FORMAT}" solids4Foam &> "${LOG}"
+            elif command -v time &> /dev/null
+            then
+                printf "Running %s on %s with time\n" \
+                    "${FLUID_MODEL}" "${CASE}"
+                FLUID_MODEL="${FLUID_MODEL}" \
+                    command time -f "${TIME_FORMAT}" solids4Foam &> "${LOG}"
+            else
+                printf "Running %s on %s with (bash) time\n" \
+                    "${FLUID_MODEL}" "${CASE}"
+                FLUID_MODEL="${FLUID_MODEL}" \
+                    time solids4Foam &> "${LOG}"
+            fi
+        fi
+
+        # 5. Extract results
+        # ~~~~~~~~~~~~~~~~~~
+        # TODO(abzrg)
+
+        # 6. Plot the force coefficients
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        echo "Generating plots for force coefficients"
+        cp "${BENCHMARK_ROOT}"/plotScripts/*.gnuplot .
+        cp "${BENCHMARK_ROOT}"/validationData/*.dat .
+        for script in ./*.gnuplot
+        do
+            gnuplot -c "${script}"
+        done
+
+        echo "Leaving ${CASE}"
+        cd ../
+    done
+done
+
+echo "Leaving ${RUN_DIR}"
+cd ../
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+# Plot Errors
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+
+# TODO(abzrg)
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+
+printf "\n---------\n\nDone!\n\n"
+echo "View the PDF files in each of the case directories in ${RUN_DIR}"

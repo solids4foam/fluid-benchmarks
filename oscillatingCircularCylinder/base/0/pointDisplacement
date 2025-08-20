@@ -1,0 +1,84 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| solids4foam: solid mechanics and fluid-solid interaction simulations        |
+| Version:     v2.0                                                           |
+| Web:         https://solids4foam.github.io                                  |
+| Disclaimer:  This offering is not approved or endorsed by OpenCFD Limited,  |
+|              producer and distributor of the OpenFOAM software via          |
+|              www.openfoam.com, and owner of the OPENFOAM® and OpenCFD®      |
+|              trade marks.                                                   |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       pointVectorField;
+    object      pointDisplacement;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 1 0 0 0 0 0];
+
+internalField   uniform (0 0 0);
+
+boundaryField
+{
+    cylinder
+    {
+#if 0
+        name    pointDisplacement_cylinder;
+        type    codedFixedValue;
+        code
+        #{
+            using constant::mathematical::twoPi;
+
+            // Amplitude (x-direction) of displacement oscillations [m/s]
+            constexpr scalar Ax = 0.25;
+            // Frequency of displacement oscillations [1/s]
+            constexpr scalar f = 0.25;
+            // Radial velocity of displacement oscillations [rad/s]
+            constexpr omega = twoPi*f
+
+            const scalar t = this->db().time().value();
+            operator==(Ax*sin(omega*t)*vector(1, 0, 0));
+        #};
+        value   $internalField;
+#else
+        type                    solidBodyMotionDisplacement;
+        solidBodyMotionFunction oscillatingLinearMotion;
+
+        // x =  amplitude*sin(omega*t)
+        oscillatingLinearMotionCoeffs
+        {
+            // Amplitude (x-direction) of displacement oscillations [m/s]
+            Ax              0.25;
+            // Frequency of displacement oscillations [1/s]
+            f               0.25;
+
+            // Amplitude vector [m/s]
+            amplitude       ($Ax 0 0);
+
+            // Radial velocity of displacement oscillations [rad/s]
+            omega           ${{ 2*pi()*$f }};
+        }
+#endif
+    }
+
+    slipWalls
+    {
+        type    slip;
+    }
+
+    noSlipWalls
+    {
+        type    fixedValue;
+        value   $internalField;
+    }
+
+    frontAndBack
+    {
+        type    empty;
+    }
+}
+
+
+// ************************************************************************* //
