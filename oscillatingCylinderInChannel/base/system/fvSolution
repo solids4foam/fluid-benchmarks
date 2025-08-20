@@ -18,11 +18,11 @@ FoamFile
 
 solvers
 {
-    "p|pFinal|pcorr|pcorrFinal"
+    "p|pFinal|pcorr|pcorrFinal|cellDisplacement|cellDisplacementFinal"
     {
         solver          GAMG;
         tolerance       1e-06;
-        relTol          0;
+        relTol          0.001;
         minIter         1;
         maxIter         1000;
         smoother        GaussSeidel;
@@ -42,16 +42,9 @@ solvers
         solver          PBiCG;
         preconditioner  DILU;
         tolerance       1e-06;
-        relTol          0;
+        relTol          0.001;
         minIter         1;
-    }
-
-    "cellDisplacement|cellDisplacementFinal"
-    {
-        solver      GAMG;
-        tolerance   1e-6;
-        relTol      0;
-        smoother    GaussSeidel;
+        maxIter         100;
     }
 }
 
@@ -59,14 +52,14 @@ PIMPLE
 {
     momentumPredictor   yes;
     correctPhi          yes;
-    nOuterCorrectors    2;
+    nOuterCorrectors    30;
     nCorrectors         3;
     nNonOrthogonalCorrectors    1;
 
     pRefPoint   (0.5 0.2 0);
     pRefValue   0.0;
 
-    moveMeshOuterCorrectors true;
+    moveMeshOuterCorrectors false;
     consistent  true;
 
     residualControl
@@ -78,7 +71,7 @@ PIMPLE
         }
         U
         {
-            tolerance 1e-7;
+            tolerance 1e-6;
             relTol 0;
         }
     }
@@ -86,12 +79,5 @@ PIMPLE
 
 relaxationFactors
 {}
-
-// Cache gradients for pimpleFluid
-cache
-{
-    //grad(U); // already stored in fluidModel
-    grad(p);
-}
 
 // ************************************************************************* //

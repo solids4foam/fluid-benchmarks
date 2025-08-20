@@ -45,7 +45,7 @@ echo "Building src/correctedFvPatchFields"
 
 # Define configurations as space-separated strings
 configs=(
-    "BASE=base NAME=poly.newtonIcoFluid MESH=POLY PIMPLEFLUID=0"
+    "BASE=base NAME=quad.pimpleFluid MESH=QUAD PIMPLEFLUID=1"
 )
 readonly configs
 # Description
@@ -236,10 +236,6 @@ do
         if (( PIMPLEFLUID == 1 ))
         then
             FLUID_MODEL="pimpleFluid"
-        else
-            # Replace fvSolution
-            echo "cp system/fvSolution.newtonIcoFluid system/fvSolution"
-            \cp system/fvSolution.newtonIcoFluid system/fvSolution
         fi
 
         # 4. Run, log and profile the solver

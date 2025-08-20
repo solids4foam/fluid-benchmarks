@@ -22,13 +22,20 @@ internalField   uniform (0 0 0);
 
 boundaryField
 {
-    ".*"
+    cylinder
     {
         // `newMovingWallVelocity` implements boundary non-orthogonal
         // corrections, which are required for second-order accuracy.
-        // Note that the moving wall condition reduces to a noSlip condition for
-        // stationary wall.
         type            newMovingWallVelocity;
+        value           uniform (0 0 0);
+    }
+
+    "up|down|left|right"
+    {
+        // `fixedValueCorrected` employs non-orthogonal corrections which are
+        // required to achieve second-order accuracy on grids with
+        // boundary non-orthogonality.
+        type            fixedValueCorrected;
         value           uniform (0 0 0);
     }
 

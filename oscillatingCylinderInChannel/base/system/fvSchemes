@@ -38,6 +38,7 @@ gradSchemes
     grad(p) leastSquaresS4f;
     grad(pcorr) leastSquaresS4f;
     grad(D) leastSquaresS4f;
+    grad(cellDisplacement) leastSquaresS4f;
 }
 
 divSchemes

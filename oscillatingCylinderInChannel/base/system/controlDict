@@ -38,7 +38,8 @@ writeControl    runTime;
 
 writeInterval   24;
 
-writeFormat     binary;
+writeFormat     ascii;
+//writeFormat     binary; // issue?
 
 writePrecision  6;
 
@@ -73,7 +74,7 @@ functions
         CofR            (0 0 0);
 
         writeControl    timeStep;
-        writeInterval   1;
+        writeInterval   10;
         log             off;
     }
 
@@ -127,7 +128,7 @@ functions
         rhoInf          1;      // Redundant for incompressible-flow cases
 
         writeControl    timeStep;
-        writeInterval   1;
+        writeInterval   10;
         log             off;
     }
 } 

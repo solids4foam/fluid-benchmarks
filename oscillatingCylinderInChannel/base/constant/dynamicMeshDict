@@ -18,11 +18,13 @@ FoamFile
 
 dynamicFvMesh   dynamicMotionSolverFvMesh;
 
-solver          solids4foamSolidModel;
+motionSolverLibs    (fvMotionSolvers);
 
-solids4foamSolidModelCoeffs
+motionSolver        displacementLaplacian;
+
+displacementLaplacianCoeffs
 {
-    regionName      meshMotionFluid;
+    diffusivity     inverseDistance (cylinder);
 }
 
 // ************************************************************************* //

@@ -24,8 +24,21 @@ boundaryField
 {
     cylinder
     {
-        type            calculated;
-        value           uniform (0 0 0);
+        type                    solidBodyMotionDisplacement;
+        solidBodyMotionFunction oscillatingLinearMotion;
+        oscillatingLinearMotionCoeffs
+        {
+            // Amplitude (x-direction) of displacement oscillations [m/s]
+            Ax              0.25;
+            // Frequency of displacement oscillations [1/s]
+            f               0.25;
+
+            // Amplitude vector [m/s]
+            amplitude       ($Ax 0 0);
+
+            // Radial velocity of displacement oscillations [rad/s]
+            omega           ${{ 2*pi()*$f }};
+        }
     }
 
     "left|right"
