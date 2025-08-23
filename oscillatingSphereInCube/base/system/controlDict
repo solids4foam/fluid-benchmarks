@@ -71,7 +71,7 @@ functions
         h               ${{ 0.125*$D }};
 
         // Max velocity is the x direction
-        magUxMax        ${{ 2*pi()*$h }};
+        magUxMax        ${{ 2.0 * pi() * $h }};
 
         // Freestream velocity magnitude
         magUInf         $magUxMax;
@@ -80,7 +80,7 @@ functions
         lRef            $D;
 
         // Reference area
-        Aref            ${{ pi() * $sphereDiameter * $sphereDiameter }};
+        Aref            ${{ 0.25 * pi() * $D * $D }};
 
         // Center of rotation
         CofR            (0 0 0);
