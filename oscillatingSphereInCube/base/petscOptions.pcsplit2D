@@ -18,13 +18,13 @@
 -ksp_pc_side right
 
 -pc_type fieldsplit
--pc_fieldsplit_block_size 3
+-pc_fieldsplit_block_size 4
 
 # Velocity in 2-D
--pc_fieldsplit_0_fields 0,1
+-pc_fieldsplit_0_fields 0,1,2
 
 # Pressure in 2-D
--pc_fieldsplit_1_fields 2
+-pc_fieldsplit_1_fields 3
 
 -pc_fieldsplit_type schur
 -pc_fieldsplit_schur_factorization_type lower
