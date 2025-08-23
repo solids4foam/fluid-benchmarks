@@ -39,7 +39,6 @@ writeControl    timeStep;
 writeInterval   10;
 
 writeFormat     ascii;
-//writeFormat     binary; // issue?
 
 writePrecision  6;
 
@@ -67,25 +66,21 @@ functions
         // Only report drag (Cd) and lift (Cl) coefficients and omit others
         coefficients    (Cd Cl);
 
-        // Frequency and amplitude of sphere displacement oscillation
-        f               0.25;
-        A               0.25;
-        // NOTE(abzrg): Here I considered the maximum x-velocity of the sphere
-        //              patch: u_max = max(2*π*f*A*cos(2*π*f*t))
-        magUxMax        ${{ 2*pi()*$f*$A }}; // Maximum x velocity magnitude
+        // Diameter of the sphere
+        D               1.0;
+        h               ${{ 0.125*$D }};
+
+        // Max velocity is the x direction
+        magUxMax        ${{ 2*pi()*$h }};
 
         // Freestream velocity magnitude
-        magUInf         $magUxMax; // 0.39269908169872414
+        magUInf         $magUxMax;
 
-        // Span of mesh in the z (depth) direction
-        // See blockMeshDict.vertices
-        meshSpanZ       0.1;
-        // Diameter of the sphere
-        cylDiameter     0.1;
         // Reference length
-        lRef            $cylDiameter;
-        // Reference area (projected area per unit depth in 2D)
-        Aref            ${{ $meshSpanZ * $cylDiameter }};
+        lRef            $D;
+
+        // Reference area
+        Aref            ${{ pi() * $sphereDiameter * $sphereDiameter }};
 
         // Center of rotation
         CofR            (0 0 0);
@@ -105,7 +100,7 @@ functions
         rhoInf          1;      // Redundant for incompressible-flow cases
 
         writeControl    timeStep;
-        writeInterval   10;
+        writeInterval   1;
         log             off;
     }
 } 
