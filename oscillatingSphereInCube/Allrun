@@ -63,7 +63,7 @@ readonly configs
 # Mesh level (density) range (integer). Higher values correspond to finer
 # meshes. The minimum level is 1 and the maximum level is 8. For finer meshes
 # edit `${BASE}/system/blockMeshDict*` for the quadrilaterial meshes and
-# `${BASE}/gmsh/oscillatingCylinderInChannel.geo` for the triangular and
+# `${BASE}/gmsh/oscillatingSphereInCube.geo` for the triangular and
 # polyhedral meshes
 declare -i START_MESH=1
 declare -i END_MESH=4
@@ -171,10 +171,10 @@ do
                 # Generate the mesh using Gmsh
                 runApplication gmsh -3 -format msh2 -setnumber \
                     meshLevel ${mesh_level} \
-                    gmsh/oscillatingSphereInChannel.geo
+                    gmsh/oscillatingSphereInCube.geo
 
                 # Convert Gmsh mesh to OpenFOAM format
-                runApplication gmshToFoam gmsh/oscillatingSphereInChannel.msh
+                runApplication gmshToFoam gmsh/oscillatingSphereInCube.msh
 
                 if [[ "$MESH" == "POLY" ]]
                 then
