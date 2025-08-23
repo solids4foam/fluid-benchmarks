@@ -38,7 +38,7 @@ newtonIcoFluidCoeffs
     pRefValue       0.0;
 
     // PETSc options file used by PETSc SNES
-    optionsFile     petscOptions.pcsplit2D;
+    optionsFile     petscOptions.pcsplit3D;
     //optionsFile     petscOptions.lu;
 }
 
