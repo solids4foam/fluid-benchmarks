@@ -314,7 +314,7 @@ do
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         echo "Generating plots for force coefficients"
         cp "${BENCHMARK_ROOT}"/plotScripts/*.gnuplot .
-        cp "${BENCHMARK_ROOT}"/validationData/*.dat .
+        cp "${BENCHMARK_ROOT}"/verificationData/*.dat .
         for script in ./*.gnuplot
         do
             gnuplot -c "${script}"
