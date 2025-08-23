@@ -41,7 +41,7 @@
 -fieldsplit_1_ksp_type preonly
 -fieldsplit_1_pc_type asm
 -fieldsplit_1_sub_pc_type ilu
--fieldsplit_1_sub_pc_factor_levels 3
+-fieldsplit_1_sub_pc_factor_levels 0
 
 #-snes_lag_preconditioner 2
 #-snes_lag_preconditioner_persists
