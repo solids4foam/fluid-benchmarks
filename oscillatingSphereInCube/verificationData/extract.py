@@ -44,5 +44,6 @@ for i in range(1, len(bins)):
 
 import pandas as pd
 df = pd.DataFrame({"Time": x_vals, "Cd": y_vals})
-import caas_jupyter_tools
-caas_jupyter_tools.display_dataframe_to_user("Extracted Cd vs Time", df)
+
+# Export data
+df.to_csv("Cd.dat", sep=" ", index=False, header=False)
