@@ -19,8 +19,15 @@ FoamFile
 
 transportModel  Newtonian;
 
-rho             rho [1 -3 0 0 0 0 0] 1; // Required by newtonIcoFluid
-nu              nu  [0 2 -1 0 0 0 0] 1e-3;
+rho             rho [1 -3 0 0 0 0 0] 1;
+nu              nu  [0 2 -1 0 0 0 0] 0.03926990817;
 
+// nu is calculated so that the Reynolds number is 20
+// Re = Umax*D/nu = 20;
+// Umax = 2*pi*h = 2*pi*D/8;
+// Re = (2*pi*D/8)*D/nu = 20
+// if D = 1, then
+// 20 = (2*pi/8)/nu = pi/(4*nu);
+// nu = pi/(4*20) = pi/80 = 0.03926990817
 
 // ************************************************************************* //
