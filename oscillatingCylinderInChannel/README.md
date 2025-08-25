@@ -80,7 +80,7 @@ where $t$ is time, $A = 0.25\; \mathrm m$ is the oscillation amplitude, $\omega
  frequency, and $\mathbf{x}_{{\mathrm cyl}_0}$ is the initial location points on
  the `cylinder` patch, where $\mathbf{x}_{\mathrm{cyl}_0}^x $ and
  $\mathbf{x}_{\mathrm{cyl}_0}^y $ are its $x$ and $y$ components respectively.
- This motion is specified in the `0/D` file.
+ This motion is specified in the `0/pointDisplacement` file.
 
 ### Boundary condition
 
@@ -255,34 +255,33 @@ motionSolverLibs    (fvMotionSolvers);
 ```
 
 In this case, among other mesh motion solvers implemented in OpenFOAM, we use
- `solids4foamSolidModel`, which is a pseudo-solid mesh motion from the
- solids4foam toolbox.
+ `displacementLaplacian`, which is a diffusion-based solver that smoothly
+ propagates motion throughout the domain.
 
 ```foam
-motionSolver        solids4foamSolidModel;
+motionSolver        displacementLaplacian;
 ```
 
-It solves a pseudo-solid equation for cell displacement (`cellDisplacement`)
- field (stored at cell centers), where the stiffness field is scaled by the
- _diffusivity_ (scalar) field. The diffusivity field determines how the motion
- of the boundary patch is distributed throughout the domain. The value for
- diffusivity is determined by specifying a diffusivity model via the
- `constant/meshMotionFluid/mechanicalProperties` dictionary:
+It solves a Laplace equation for cell displacement (`cellDisplacement`)
+ field (stored at cell centers),
+
+$$
+\nabla \cdot \left( \Gamma \nabla (\Delta \mathbf{X}_{\text{cell}}) \right) = 0,
+$$
+
+where $\Delta \mathbf{X}_{\text{cell}}$ is the cell displacement field
+ (`cellDisplacement`) and $\Gamma$ is the motion _diffusivity_ (scalar) field.
+
+ The diffusivity field determines how the motion of the boundary patch is
+ distributed throughout the domain. The value for diffusivity is determined by
+ specifying a diffusivity model via the
+ `displacementLaplacianCoeffs.diffusivity` dictionary:
 
 ```foam
-mechanical
-(
-    fluidMesh
-    {
-        type        diffusionHyperElastic;
-        rho         rho [1 -3 0 0 0 0 0] 1;
-        mu          mu [1 -1 -2 0 0 0 0] 1;
-        K           K [1 -1 -2 0 0 0 0] 4;
-        regionName  meshMotionFluid;
-        diffusivity inverseDistance (cylinder);
-        writeStiffScaleFactor no;
-    }
-);
+displacementLaplacianCoeffs
+{
+    diffusivity     inverseDistance (cylinder);
+}
 ```
 
 In this case we use the `inverseDistance` model which calculates diffusivity
@@ -291,53 +290,37 @@ In this case we use the `inverseDistance` model which calculates diffusivity
  patch are deformed more, while the cells near to the cylinder act stiffer and
  deform less, this preserving their quality.
 
-As we have selected the `solids4foamSolidModel` motion solver, the boundary
- conditions for the mesh displacement field should be presribed in `0/D`. The
- `cylinder` displacement is specified as a time series using the
- `fixedDisplacement` boundary condition:
+As we have selected the `displacementLaplacian` motion solver, the boundary
+ conditions for the mesh displacement field should be prescribed in
+ `0/pointDisplacement`. The `cylinder` displacement is specified as a rigid body
+ motion using the `solidBodyMotionDisplacement` boundary condition:
 
 ```c++
     cylinder
     {
-        type            fixedDisplacement;
-        displacementSeries
+        type                    solidBodyMotionDisplacement;
+        solidBodyMotionFunction oscillatingLinearMotion;
+
+        // \Delta X = amplitude*sin(omega*t)
+        oscillatingLinearMotionCoeffs
         {
-            file        "$FOAM_CASE/constant/timeVsDisplacement";
-            outOfBounds clamp;
+            // Amplitude (x-direction) of displacement oscillations [m]
+            Ax              0.25;
+            // Frequency of displacement oscillations [Hz]
+            f               0.25;
+
+            // Amplitude vector [m]
+            amplitude       ($Ax 0 0);
+
+            // Angular velocity of oscillations [rad/s]
+            omega           ${{ 2*pi()*$f }};
         }
     }
 ```
 
-The `timeVsDisplacement` is generated using the provided
- `constant/generateTimeVsDisplacement.py` Python script:
-
-```python
-#!/usr/bin/env python3
-import numpy as np
-
-# Parameters
-A = 0.25        # amplitude
-f = 0.25        # frequency [Hz]
-t0 = 0.0        # start time
-end_time = 25.0 # end time
-delta_t = 0.005 # time step
-x0 = 0.0        # initial displacement
-
-# Time vector
-time = np.arange(t0, end_time + delta_t, delta_t)
-
-# Displacement (only x-component varies)
-displacement = x0 + A * np.sin(2 * np.pi * f * time)
-
-# Write output
-outfile = "timeVsDisplacement"
-with open(outfile, "w") as file:
-    file.write("(\n")
-    for ti, xi in zip(time, displacement):
-        file.write(f"    ( {ti:.3f} ( {xi:.6f} 0 0 ))\n")
-    file.write(")\n")
-
-print(f"Data written to '{outfile}' with {len(time)} entries.")
+```note
+`Ax` and `f` are user-defined variables here; they are not OpenFOAM keywords but
+ are used to calculate `amplitude` and `omega`.
 ```
 
 For the `left` and `right` patches, a no-slip boundary condition is applied,
