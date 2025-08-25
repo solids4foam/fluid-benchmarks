@@ -16,7 +16,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dynamicFvMesh   dynamicMotionSolverFvMesh;
+dynamicFvMesh       dynamicMotionSolverFvMesh;
 
 motionSolverLibs    (fvMotionSolvers);
 
