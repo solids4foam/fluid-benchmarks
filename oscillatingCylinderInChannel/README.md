@@ -128,7 +128,7 @@ At this instance of time, and similarly at $t = 9.00 \mathrm{s}$, the mesh has
 Also, note that since the `cylinder` patch is moving, we need to use the motion
  boundary condition, `newMovingWallVelocity`, in the `0/U` file.
 
-```{.cpp .numberLines}
+```foam
 boundaryField
 {
     cylinder
@@ -136,7 +136,8 @@ boundaryField
         type            newMovingWallVelocity;
         value           uniform (0 0 0);
     }
-...
+    ...
+}
 ```
 
 ```note
@@ -295,7 +296,9 @@ As we have selected the `displacementLaplacian` motion solver, the boundary
  `0/pointDisplacement`. The `cylinder` displacement is specified as a rigid body
  motion using the `solidBodyMotionDisplacement` boundary condition:
 
-```c++
+```foam
+boundaryField
+{
     cylinder
     {
         type                    solidBodyMotionDisplacement;
@@ -316,6 +319,8 @@ As we have selected the `displacementLaplacian` motion solver, the boundary
             omega           ${{ 2*pi()*$f }};
         }
     }
+    ...
+}
 ```
 
 ```note
@@ -339,7 +344,8 @@ boundaryField
     {
         type    slip;
     }
-...
+    ...
+}
 ```
 
 ---
@@ -471,14 +477,14 @@ Performing a simple calculation,
 
 $$
 |\mathbf{U}_\infty| = 2 \pi f A_{\text{ref}}
-                     = 2 \times \pi \times 0.25 \times 0.25
-               \approx 0.3927\ \mathrm{m}\,\mathrm{s}^{-1},
+                    = 2 \times \pi \times 0.25 \times 0.25
+              \approx 0.3927\ \mathrm{m}\,\mathrm{s}^{-1},
 $$
 
 $$
 p_{\text{dyn}} = \frac{1}{2} \rho_{\infty} \mathbf{U}_\infty^2
-                = 0.5 \times 1.0 \times (0.3927)^2
-          \approx 0.0771\ \mathrm{Pa},
+               = 0.5 \times 1.0 \times (0.3927)^2
+         \approx 0.0771\ \mathrm{Pa},
 $$
 
 $$
