@@ -101,13 +101,13 @@ then
     NUMBER_OF_SUBDOMAINS="${NUMBER_OF_SUBDOMAINS}" runApplication decomposePar
 
     # Run the solver (parallel)
-    FLUID_MODEL="${FLUID_MODEL}" runParallel $(getApplication)
+    FLUID_MODEL="${FLUID_MODEL}" runParallel "$(getApplication)"
 
     # Deconstruct the result
     runApplication reconstructPar -no-fields -latestTime
 else
     # Run the solver (serial)
-    FLUID_MODEL="${FLUID_MODEL}" runApplication $(getApplication)
+    FLUID_MODEL="${FLUID_MODEL}" runApplication "$(getApplication)"
 fi
 
 # Generate the plots
