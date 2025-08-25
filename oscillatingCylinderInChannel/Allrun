@@ -115,7 +115,7 @@ readonly RUN_DIR CPU_TYPE DATE_TIME
 # Skip (re)making `RUN_DIR` if it already exists
 if [[ ! -d "${RUN_DIR}" ]]
 then
-    echo "Creating ${RUN_DIR}"
+    echo "\nCreating ${RUN_DIR}"
     mkdir "${RUN_DIR}"
 fi
 
