@@ -108,7 +108,7 @@ public:
         //- Return a clone
         virtual tmp<fvPatchField<vector>> clone() const
         {
-            return fvPatchField<vector>::Clone(*this);
+            return tmp<fvPatchField<vector>>::New(*this);
         }
 
         //- Clone with an internal field reference
@@ -117,7 +117,7 @@ public:
             const DimensionedField<vector, volMesh>& iF
         ) const
         {
-            return fvPatchField<vector>::Clone(*this, iF);
+            return tmp<fvPatchField<vector>>::New(*this, iF);
         }
 
 
