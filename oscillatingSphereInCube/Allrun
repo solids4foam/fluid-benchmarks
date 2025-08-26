@@ -130,7 +130,7 @@ fi
 # Run the cases
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
-. $WM_PROJECT_DIR/bin/tools/RunFunctions
+. "${WM_PROJECT_DIR}"/bin/tools/RunFunctions
 
 BENCHMARK_ROOT=$PWD
 echo "Entering ${RUN_DIR}"
@@ -143,11 +143,11 @@ do
     declare -i PIMPLEFLUID
 
     # Parse the configuration string
-    eval ${config}
+    eval "${config}"
 
     printf '\n***************************************'
     printf '\n* Running configuration:'
-    printf '\n* - %s' ${config}
+    printf '\n* - %s' "${config}"
     printf '\n***************************************\n'
 
     # Loop over mesh levels (densities) in each configuration
@@ -170,7 +170,7 @@ do
             then
                 # Generate the mesh using Gmsh
                 runApplication gmsh -3 -format msh2 -setnumber \
-                    meshLevel ${mesh_level} \
+                    meshLevel "${mesh_level}" \
                     gmsh/oscillatingSphereInCube.geo
 
                 # Convert Gmsh mesh to OpenFOAM format
