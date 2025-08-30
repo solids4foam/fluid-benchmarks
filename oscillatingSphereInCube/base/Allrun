@@ -52,7 +52,8 @@ case "${MESH}" in
         echo "Generating ${MESH} mesh using Gmsh."
 
         # Generate the mesh using Gmsh
-        runApplication gmsh -3 -format msh2 -setnumber meshLevel "${MESH_LEVEL}" \
+        runApplication gmsh -3 -format msh2 \
+            -setnumber meshLevel "${MESH_LEVEL}" \
             gmsh/oscillatingSphereInCube.geo \
             -o gmsh/oscillatingSphereInCube.msh
 
@@ -68,7 +69,6 @@ case "${MESH}" in
             # is less than 45 degrees.
             runApplication combinePatchFaces 45 -overwrite
         fi
-
         ;;
 
     *)
