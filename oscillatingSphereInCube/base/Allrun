@@ -25,9 +25,25 @@ set -e
 . "${WM_PROJECT_DIR}"/bin/tools/RunFunctions
 
 case "${MESH}" in
-    "HEX")
+    "HEX" | "HEX_GRADED")
+        # Set the blockMeshDict
+        BLOCKMESHDICT="system/blockMeshDict"
+        if [[ "$MESH" == "HEX_GRADED" ]]
+        then
+            BLOCKMESHDICT="${BLOCKMESHDICT}.graded"
+        fi
+
+        if [[ ! -f "${BLOCKMESHDICT}" ]]
+        then
+            printf "Cannot find ./%s: please add it to ./system/\n\n" \
+                   "${BLOCKMESHDICT}" >&2
+            exit 1
+        fi
+
         echo "Generating ${MESH} mesh using blockMesh."
-        MESH_LEVEL=${MESH_LEVEL} runApplication blockMesh
+
+        MESH_LEVEL=${MESH_LEVEL} \
+            runApplication -suffix "${MESH}" blockMesh -dict "${BLOCKMESHDICT}"
 
         if command -v projectPatchToSphere &>/dev/null
         then
