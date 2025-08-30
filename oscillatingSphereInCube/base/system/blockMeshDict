@@ -129,7 +129,6 @@ vertices
     ( $vc  $vc  $vc)    // 63
 );
 
-
 // Mesh density level. Higher values correspond to finer meshes
 //
 // One can specify the mesh density level from the command-line by simply using
