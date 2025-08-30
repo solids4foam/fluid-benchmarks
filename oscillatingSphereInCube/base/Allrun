@@ -97,10 +97,15 @@ else
 fi
 
 # Generate the plots - to-do
-#cp ../plotScripts/*.gnuplot .
-#cp ../validationData/*.dat .
+cp ../plotScripts/*.gnuplot .
+cp ../verificationData/*.dat .
 
+echo "Generating plots for drag coefficients"
 for script in ./*.gnuplot
 do
+    # TODO(abzrg): update the script so that it does not contain hardcoded
+    #              values, and that it can receive commandline arguments per
+    #              bellow:
+    #                  $ gnuplot -c <script> <datafile> <outfile>
     gnuplot -c "${script}"
 done

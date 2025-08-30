@@ -277,13 +277,13 @@ do
 
         # 6. Plot the force coefficients
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        #echo "Generating plots for force coefficients"
-        #cp "${BENCHMARK_ROOT}"/plotScripts/*.gnuplot .
-        #cp "${BENCHMARK_ROOT}"/validationData/*.dat .
-        #for script in ./*.gnuplot
-        #do
-        #    gnuplot -c "${script}"
-        #done
+        echo "Generating plots for drag coefficients"
+        cp "${BENCHMARK_ROOT}"/plotScripts/*.gnuplot .
+        cp "${BENCHMARK_ROOT}"/verificationData/*.dat .
+        for script in ./*.gnuplot
+        do
+            gnuplot -c "${script}"
+        done
 
         # 7. Run ParaView script
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
