@@ -16,7 +16,7 @@
 #         HEX_GRADED    structured hexagonal graded mesh (TODO(abzrg))
 #         TET           unstructured tetrahedral mesh
 #         POLY          unstructured polyhedral mesh
-:     "${MESH:=POLY}"
+:     "${MESH:=HEX}"
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 cd "${0%/*}" || exit    # Run from this directory
 set -e
