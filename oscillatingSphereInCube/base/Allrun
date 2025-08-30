@@ -12,6 +12,8 @@
 #     Fluid model to be called by solids4Foam (pimpleFluid, newtonIcoFluid)
 :     "${FLUID_MODEL:=pimpleFluid}"
 #     Mesh type:
+#         HEX           structured hexagonal mesh
+#         HEX_GRADED    structured hexagonal graded mesh (TODO(abzrg))
 #         TET           unstructured tetrahedral mesh
 #         POLY          unstructured polyhedral mesh
 :     "${MESH:=POLY}"
@@ -23,6 +25,23 @@ set -e
 . "${WM_PROJECT_DIR}"/bin/tools/RunFunctions
 
 case "${MESH}" in
+    "HEX")
+        echo "Generating ${MESH} mesh using blockMesh."
+        MESH_LEVEL=${MESH_LEVEL} runApplication blockMesh
+
+        if command -v projectPatchToSphere &>/dev/null
+        then
+            printf "%s %s\n" \
+                   "Projecting the 'sphere' patch onto a sphere" \
+                   "of radius 5 whose centre is located at '(0 0 0)'"
+            # The following command is run twice to reduce "point displacement
+            # motion" down to zero. For more information, please take a look at
+            # the output of this command and/or its help using the `-help` flag.
+            runApplication -suffix '1' projectPatchToSphere sphere '(0 0 0)' 0.5
+            runApplication -suffix '2' projectPatchToSphere sphere '(0 0 0)' 0.5
+        fi
+        ;;
+
     "TRI" | "POLY")
         if ! command -v gmsh &> /dev/null
         then
