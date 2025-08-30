@@ -61,16 +61,12 @@ case "${MESH}" in
 
         if [[ "${MESH}" == "POLY" ]]
         then
-            mv 0 0.tmp
-
             # Convert to polyhedral mesh
             runApplication polyDualMesh 45 -overwrite
 
             # Combine faces into larger polygons so that the angle between edges
             # is less than 45 degrees.
             runApplication combinePatchFaces 45 -overwrite
-
-            mv 0.tmp 0
         fi
 
         ;;
@@ -81,6 +77,9 @@ case "${MESH}" in
         exit 1
         ;;
 esac
+
+# Restore the 0/ directory from 0.orig/
+restore0Dir
 
 if [ "$1" = '-p' ];
 then
