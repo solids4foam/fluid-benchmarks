@@ -51,7 +51,10 @@ readonly configs
 # Description
 #     BASE:            name of the base template case
 #     NAME:            base name given to each case that is created
-#     MESH:            Create a tetrahedral (TET) or a polyhedral mesh (POLY)
+#     MESH:            type of the initial mesh
+#                      - structured hexahedral mesh (HEX or HEX_GRADED)
+#                      - unstructured tetrahedral mesh (TET)
+#                      - unstructured polyhedral mesh (POLY)
 #     PIMPLEFLUID:     use the pimpleFluid (1) or the newtonIcoFluid (0) models
 #
 # Example
@@ -164,7 +167,41 @@ do
 
         # 2. Create the mesh
         #~~~~~~~~~~~~~~~~~~~
-        if [[ "$MESH" == "TRI" || "$MESH" == "POLY" ]]
+        if [[ "$MESH" == "HEX" || "$MESH" == "HEX_GRADED" ]]
+        then
+            # Set the blockMeshDict
+            BLOCKMESHDICT="system/blockMeshDict" # uniform
+
+            if [[ "$MESH" == "HEX_GRADED" ]]
+            then
+                BLOCKMESHDICT="${BLOCKMESHDICT}.graded"
+            fi
+
+            if [[ ! -f "${BLOCKMESHDICT}" ]]
+            then
+                printf "Cannot find %s/%s: please add it to %s/system/\n\n" \
+                       "${CASE}" "${BLOCKMESHDICT}" "${BASE}" >&2
+                exit 1
+            fi
+
+            echo "Using ${BLOCKMESHDICT} with mesh level $mesh_level"
+
+            MESH_LEVEL="${mesh_level}" \
+                runApplication blockMesh -dict "${BLOCKMESHDICT}"
+
+            if command -v projectPatchToSphere &>/dev/null
+            then
+                printf "%s %s\n" \
+                    "Projecting the 'sphere' patch onto a sphere" \
+                    "of radius 5 whose centre is located at '(0 0 0)'"
+                # The following command is run twice to reduce "point
+                # displacement motion" down to zero.
+                runApplication -suffix '1' \
+                    projectPatchToSphere sphere '(0 0 0)' 0.5
+                runApplication -suffix '2' \
+                    projectPatchToSphere sphere '(0 0 0)' 0.5
+            fi
+        elif [[ "$MESH" == "TRI" || "$MESH" == "POLY" ]]
         then
             if command -v gmsh &> /dev/null
             then
