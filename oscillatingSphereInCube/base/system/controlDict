@@ -38,7 +38,7 @@ writeControl    timeStep;
 
 writeInterval   10;
 
-writeFormat     ascii;
+writeFormat     binary;
 
 writePrecision  6;
 
@@ -103,6 +103,6 @@ functions
         writeInterval   1;
         log             off;
     }
-} 
+}
 
 // ************************************************************************* //
