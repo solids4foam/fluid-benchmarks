@@ -26,17 +26,18 @@ boundaryField
     {
 #if 0
         type                    codedFixedValue;
-        name                    oscillatingSphere;
+        name                    pointDisplacementSphere;
         code
         #{
-            using constant::mathematical::pi;
+            using constant::mathematical::twoPi;
 
-            const scalar D = 1.0;
-            const scalar h = 0.125*D;
+            constexpr scalar D = 1.0;
+            constexpr scalar h = 0.125*D;
             const scalar t = this->db().time().value();
 
-            operator==(h*(1.0 - Foam::cos(2*pi*t))*vector(1, 0, 0));
+            operator==(h*(1.0 - cos(twoPi*t))*vector(1, 0, 0));
         #};
+        value   $internalField;
 #else
         type                    solidBodyMotionDisplacement;
         solidBodyMotionFunction oscillatingLinearMotion;
