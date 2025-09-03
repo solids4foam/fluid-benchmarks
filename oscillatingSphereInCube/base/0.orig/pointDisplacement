@@ -24,6 +24,7 @@ boundaryField
 {
     sphere
     {
+#if 0
         type                    codedFixedValue;
         name                    oscillatingSphere;
         code
@@ -36,6 +37,29 @@ boundaryField
 
             operator==(h*(1.0 - Foam::cos(2*pi*t))*vector(1, 0, 0));
         #};
+#else
+        type                    solidBodyMotionDisplacement;
+        solidBodyMotionFunction oscillatingLinearMotion;
+        /*
+            Reference displacement function written in terms of cosine
+            x(t) = -h*\cos(2*\pi*t) + h
+                 = -h*\sin(2*\pi*t + \pi/2) + h
+                 = -h*\sin(2*\pi*(t + (\pi/2)/(2\pi))) + h
+                 = -h*\sin(2*\pi*(t + 1/4)) + h
+
+            oscillatingLinerMotion function:
+            x =  A*\sin(B*(t + C)) + D
+        */
+        oscillatingLinearMotionCoeffs
+        {
+            h               0.125;          // [m]
+
+            amplitude       (-$h 0 0);      // [m] vector, x-direction motion
+            omega           ${{ 2*pi() }};  // [rad/s] (period = 1s)
+            phaseShift      0.25;           // [s]
+            verticalShift   ($h 0 0);       // [m] vector shift
+        }
+#endif
     }
 
     "xmin|xmax"
