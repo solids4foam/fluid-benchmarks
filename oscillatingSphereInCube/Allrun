@@ -216,7 +216,7 @@ do
             runApplication surfaceToFMS geometry.stl
 
             # Generate the mesh using cfMesh
-            MESH_LEVEL="${MESH_LEVEL}" runApplication cartesianMesh
+            MESH_LEVEL="${mesh_level}" runApplication cartesianMesh
 
             if ! command -v projectSphereToPatch &> /dev/null
             then
