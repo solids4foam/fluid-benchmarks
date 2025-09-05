@@ -53,6 +53,7 @@ readonly configs
 #     NAME:            base name given to each case that is created
 #     MESH:            type of the initial mesh
 #                      - structured hexahedral mesh (HEX or HEX_GRADED)
+#                      - unstructured hexagonal mesh (CARTESIAN)
 #                      - unstructured tetrahedral mesh (TET)
 #                      - unstructured polyhedral mesh (POLY)
 #     PIMPLEFLUID:     use the pimpleFluid (1) or the newtonIcoFluid (0) models
@@ -200,6 +201,30 @@ do
                     projectPatchToSphere sphere '(0 0 0)' 0.5
                 runApplication -suffix '2' \
                     projectPatchToSphere sphere '(0 0 0)' 0.5
+            fi
+        elif [[ "${MESH}" == "CARTESIAN" ]]
+        then
+            if ! command -v cartesianMesh &> /dev/null
+            then
+                echo "Cartesianmesh not found. Please install it."
+            fi
+
+            # Combine surfaces into one surface
+            cat ./boundingBox.stl ./sphere.stl > geometry.stl
+
+            # Convert the surface from STL to FMS format
+            runApplication surfaceToFMS geometry.stl
+
+            # Generate the mesh using cfMesh
+            MESH_LEVEL="${MESH_LEVEL}" runApplication cartesianMesh
+
+            if ! command -v projectSphereToPatch &> /dev/null
+            then
+                printf "%s %s\n" \
+                       "Projecting the 'sphere' patch onto a sphere" \
+                       "of radius 5 whose centre is located at '(0 0 0)'"
+                runApplication -suffix '1' projectPatchToSphere sphere '(0 0 0)' 0.5
+                runApplication -suffix '2' projectPatchToSphere sphere '(0 0 0)' 0.5
             fi
         elif [[ "$MESH" == "TRI" || "$MESH" == "POLY" ]]
         then
