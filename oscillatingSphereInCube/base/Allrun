@@ -13,7 +13,7 @@
 :     "${FLUID_MODEL:=pimpleFluid}"
 #     Mesh type:
 #         HEX           structured hexagonal mesh
-#         HEX_GRADED    structured hexagonal graded mesh (TODO(abzrg))
+#         HEX_GRADED    structured hexagonal graded mesh
 #         TET           unstructured tetrahedral mesh
 #         POLY          unstructured polyhedral mesh
 :     "${MESH:=HEX}"
