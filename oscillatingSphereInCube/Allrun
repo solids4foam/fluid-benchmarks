@@ -45,13 +45,17 @@ echo "Building src/correctedFvPatchFields"
 
 # Define configurations as space-separated strings
 configs=(
-    "BASE=base NAME=poly.pimpleFluid MESH=POLY PIMPLEFLUID=1"
+    "BASE=base NAME=hex.pimpleFluid MESH=HEX PIMPLEFLUID=1"
 )
 readonly configs
 # Description
 #     BASE:            name of the base template case
 #     NAME:            base name given to each case that is created
-#     MESH:            Create a tetrahedral (TET) or a polyhedral mesh (POLY)
+#     MESH:            type of the initial mesh
+#                      - structured hexahedral mesh (HEX or HEX_GRADED)
+#                      - unstructured hexagonal mesh (CARTESIAN)
+#                      - unstructured tetrahedral mesh (TET)
+#                      - unstructured polyhedral mesh (POLY)
 #     PIMPLEFLUID:     use the pimpleFluid (1) or the newtonIcoFluid (0) models
 #
 # Example
@@ -164,7 +168,65 @@ do
 
         # 2. Create the mesh
         #~~~~~~~~~~~~~~~~~~~
-        if [[ "$MESH" == "TRI" || "$MESH" == "POLY" ]]
+        if [[ "$MESH" == "HEX" || "$MESH" == "HEX_GRADED" ]]
+        then
+            # Set the blockMeshDict
+            BLOCKMESHDICT="system/blockMeshDict" # uniform
+
+            if [[ "$MESH" == "HEX_GRADED" ]]
+            then
+                BLOCKMESHDICT="${BLOCKMESHDICT}.graded"
+            fi
+
+            if [[ ! -f "${BLOCKMESHDICT}" ]]
+            then
+                printf "Cannot find %s/%s: please add it to %s/system/\n\n" \
+                       "${CASE}" "${BLOCKMESHDICT}" "${BASE}" >&2
+                exit 1
+            fi
+
+            echo "Using ${BLOCKMESHDICT} with mesh level $mesh_level"
+
+            MESH_LEVEL="${mesh_level}" \
+                runApplication blockMesh -dict "${BLOCKMESHDICT}"
+
+            if command -v projectPatchToSphere &>/dev/null
+            then
+                printf "%s %s\n" \
+                    "Projecting the 'sphere' patch onto a sphere" \
+                    "of radius 5 whose centre is located at '(0 0 0)'"
+                # The following command is run twice to reduce "point
+                # displacement motion" down to zero.
+                runApplication -suffix '1' \
+                    projectPatchToSphere sphere '(0 0 0)' 0.5
+                runApplication -suffix '2' \
+                    projectPatchToSphere sphere '(0 0 0)' 0.5
+            fi
+        elif [[ "${MESH}" == "CARTESIAN" ]]
+        then
+            if ! command -v cartesianMesh &> /dev/null
+            then
+                echo "Cartesianmesh not found. Please install it."
+            fi
+
+            # Combine surfaces into one surface
+            cat ./boundingBox.stl ./sphere.stl > geometry.stl
+
+            # Convert the surface from STL to FMS format
+            runApplication surfaceToFMS geometry.stl
+
+            # Generate the mesh using cfMesh
+            MESH_LEVEL="${mesh_level}" runApplication cartesianMesh
+
+            if ! command -v projectSphereToPatch &> /dev/null
+            then
+                printf "%s %s\n" \
+                       "Projecting the 'sphere' patch onto a sphere" \
+                       "of radius 5 whose centre is located at '(0 0 0)'"
+                runApplication -suffix '1' projectPatchToSphere sphere '(0 0 0)' 0.5
+                runApplication -suffix '2' projectPatchToSphere sphere '(0 0 0)' 0.5
+            fi
+        elif [[ "$MESH" == "TRI" || "$MESH" == "POLY" ]]
         then
             if command -v gmsh &> /dev/null
             then
@@ -178,16 +240,12 @@ do
 
                 if [[ "$MESH" == "POLY" ]]
                 then
-                    mv 0 0.tmp
-
                     # Convert to polyhedral mesh
                     runApplication polyDualMesh 45 -overwrite
 
                     # Combine faces into larger polygons so that the angle
                     # between edges is less than 45 degrees.
                     runApplication combinePatchFaces 45 -overwrite
-
-                    mv 0.tmp 0
                 fi
             else
                 echo "gmsh not found: please install it"
@@ -211,6 +269,9 @@ do
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         # Set the log file name
         LOG="log.solids4Foam.${FLUID_MODEL}"
+
+        # Restore the 0/ directory from 0.orig/
+        restore0Dir
 
         # Run the solver
         # If "gtime" is available (could be called "time" on Linux), use it to
@@ -278,13 +339,13 @@ do
 
         # 6. Plot the force coefficients
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        #echo "Generating plots for force coefficients"
-        #cp "${BENCHMARK_ROOT}"/plotScripts/*.gnuplot .
-        #cp "${BENCHMARK_ROOT}"/validationData/*.dat .
-        #for script in ./*.gnuplot
-        #do
-        #    gnuplot -c "${script}"
-        #done
+        echo "Generating plots for drag coefficients"
+        cp "${BENCHMARK_ROOT}"/plotScripts/*.gnuplot .
+        cp "${BENCHMARK_ROOT}"/verificationData/*.dat .
+        for script in ./*.gnuplot
+        do
+            gnuplot -c "${script}"
+        done
 
         # 7. Run ParaView script
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

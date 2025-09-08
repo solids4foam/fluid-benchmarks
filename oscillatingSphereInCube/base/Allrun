@@ -12,9 +12,12 @@
 #     Fluid model to be called by solids4Foam (pimpleFluid, newtonIcoFluid)
 :     "${FLUID_MODEL:=pimpleFluid}"
 #     Mesh type:
+#         HEX           structured hexagonal mesh
+#         HEX_GRADED    structured hexagonal graded mesh
+#         CARTESIAN     unstructured hexagonal mesh
 #         TET           unstructured tetrahedral mesh
 #         POLY          unstructured polyhedral mesh
-:     "${MESH:=POLY}"
+:     "${MESH:=CARTESIAN}"
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 cd "${0%/*}" || exit    # Run from this directory
 set -e
@@ -23,6 +26,64 @@ set -e
 . "${WM_PROJECT_DIR}"/bin/tools/RunFunctions
 
 case "${MESH}" in
+    "HEX" | "HEX_GRADED")
+        # Set the blockMeshDict
+        BLOCKMESHDICT="system/blockMeshDict"
+        if [[ "$MESH" == "HEX_GRADED" ]]
+        then
+            BLOCKMESHDICT="${BLOCKMESHDICT}.graded"
+        fi
+
+        if [[ ! -f "${BLOCKMESHDICT}" ]]
+        then
+            printf "Cannot find ./%s: please add it to ./system/\n\n" \
+                   "${BLOCKMESHDICT}" >&2
+            exit 1
+        fi
+
+        echo "Generating ${MESH} mesh using blockMesh."
+
+        MESH_LEVEL=${MESH_LEVEL} \
+            runApplication -suffix "${MESH}" blockMesh -dict "${BLOCKMESHDICT}"
+
+        if command -v projectPatchToSphere &>/dev/null
+        then
+            printf "%s %s\n" \
+                   "Projecting the 'sphere' patch onto a sphere" \
+                   "of radius 5 whose centre is located at '(0 0 0)'"
+            # The following command is run twice to reduce "point displacement
+            # motion" down to zero. For more information, please take a look at
+            # the output of this command and/or its help using the `-help` flag.
+            runApplication -suffix '1' projectPatchToSphere sphere '(0 0 0)' 0.5
+            runApplication -suffix '2' projectPatchToSphere sphere '(0 0 0)' 0.5
+        fi
+        ;;
+
+    "CARTESIAN")
+        if ! command -v cartesianMesh &> /dev/null
+        then
+            echo "Cartesianmesh not found. Please install it."
+        fi
+
+        # Combine surfaces into one surface
+        cat ./boundingBox.stl ./sphere.stl > geometry.stl
+
+        # Convert the surface from STL to FMS format
+        runApplication surfaceToFMS geometry.stl
+
+        # Generate the mesh using cfMesh
+        MESH_LEVEL="${MESH_LEVEL}" runApplication cartesianMesh
+
+        if ! command -v projectSphereToPatch &> /dev/null
+        then
+            printf "%s %s\n" \
+                   "Projecting the 'sphere' patch onto a sphere" \
+                   "of radius 5 whose centre is located at '(0 0 0)'"
+            runApplication -suffix '1' projectPatchToSphere sphere '(0 0 0)' 0.5
+            runApplication -suffix '2' projectPatchToSphere sphere '(0 0 0)' 0.5
+        fi
+        ;;
+
     "TRI" | "POLY")
         if ! command -v gmsh &> /dev/null
         then
@@ -33,7 +94,8 @@ case "${MESH}" in
         echo "Generating ${MESH} mesh using Gmsh."
 
         # Generate the mesh using Gmsh
-        runApplication gmsh -3 -format msh2 -setnumber meshLevel "${MESH_LEVEL}" \
+        runApplication gmsh -3 -format msh2 \
+            -setnumber meshLevel "${MESH_LEVEL}" \
             gmsh/oscillatingSphereInCube.geo \
             -o gmsh/oscillatingSphereInCube.msh
 
@@ -42,18 +104,13 @@ case "${MESH}" in
 
         if [[ "${MESH}" == "POLY" ]]
         then
-            mv 0 0.tmp
-
             # Convert to polyhedral mesh
             runApplication polyDualMesh 45 -overwrite
 
             # Combine faces into larger polygons so that the angle between edges
             # is less than 45 degrees.
             runApplication combinePatchFaces 45 -overwrite
-
-            mv 0.tmp 0
         fi
-
         ;;
 
     *)
@@ -62,6 +119,9 @@ case "${MESH}" in
         exit 1
         ;;
 esac
+
+# Restore the 0/ directory from 0.orig/
+restore0Dir
 
 if [ "$1" = '-p' ];
 then
@@ -79,10 +139,15 @@ else
 fi
 
 # Generate the plots - to-do
-#cp ../plotScripts/*.gnuplot .
-#cp ../validationData/*.dat .
+cp ../plotScripts/*.gnuplot .
+cp ../verificationData/*.dat .
 
+echo "Generating plots for drag coefficients"
 for script in ./*.gnuplot
 do
+    # TODO(abzrg): update the script so that it does not contain hardcoded
+    #              values, and that it can receive commandline arguments per
+    #              bellow:
+    #                  $ gnuplot -c <script> <datafile> <outfile>
     gnuplot -c "${script}"
 done
