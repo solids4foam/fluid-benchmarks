@@ -45,7 +45,7 @@ echo "Building src/correctedFvPatchFields"
 
 # Define configurations as space-separated strings
 configs=(
-    "BASE=base NAME=hex.pimpleFluid MESH=HEX PIMPLEFLUID=1"
+    "BASE=base NAME=cartesian.pimpleFluid MESH=CARTESIAN PIMPLEFLUID=1"
 )
 readonly configs
 # Description
