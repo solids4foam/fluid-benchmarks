@@ -65,10 +65,7 @@ readonly configs
 # )
 
 # Mesh level (density) range (integer). Higher values correspond to finer
-# meshes. The minimum level is 1 and the maximum level is 8. For finer meshes
-# edit `${BASE}/system/blockMeshDict*` for the quadrilaterial meshes and
-# `${BASE}/gmsh/oscillatingSphereInCube.geo` for the triangular and
-# polyhedral meshes
+# meshes.
 declare -i START_MESH=1
 declare -i END_MESH=4
 readonly START_MESH END_MESH
