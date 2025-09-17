@@ -102,6 +102,8 @@ where $`t`$ is time, $`h = D/8 \, \mathrm{m}`$ is the oscillation amplitude, and
 > $`x = 0.75 \, \mathrm{m}`$, remaining at least $`0.25 \, \mathrm{m}`$ away
 > from the `xmax` patch and $`0.5 \, \mathrm{m}`$ away from the `xmin` patch.
 
+<!-- markdownlint MD028 -->
+
 > [!NOTE]
 > Times of extrema:
 >
@@ -267,6 +269,8 @@ newtonIcoFluidCoeffs
 > [!NOTE]
 > Coefficients for `pimpleFluid` should be specified in the
 > `system/fvSolution.PIMPLE` dictionary.
+
+<!-- markdownlint MD028 -->
 
 > [!TIP]
 > `${FLUID_MODEL:-newtonIcoFluid}` uses shell parameter expansion, meaning it
@@ -679,10 +683,14 @@ functions
 > Since the motion of the sphere in the cubic cavity creates a symmetric flow,
 > other components of the force coefficients are zero.
 
+<!-- markdownlint MD028 -->
+
 > [!TIP]
 > The chosen solver computes these quantities on the fly; however, if the
 > outputs are missing, they can be re-extracted after the simulation using:
 > `pimpleFoam -postProcess`.
+
+<!-- markdownlint MD028 -->
 
 > [!TIP]
 > The `forceCoeffs` function stores the resulting
