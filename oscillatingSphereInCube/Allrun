@@ -148,7 +148,7 @@ do
 
     printf '\n***************************************'
     printf '\n* Running configuration:'
-    printf '\n* - %s' "${config}"
+    printf '\n* - %s' ${config}
     printf '\n***************************************\n'
 
     # Loop over mesh levels (densities) in each configuration
