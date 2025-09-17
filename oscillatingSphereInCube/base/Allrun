@@ -84,7 +84,7 @@ case "${MESH}" in
         fi
         ;;
 
-    "TRI" | "POLY")
+    "TET" | "POLY")
         if ! command -v gmsh &> /dev/null
         then
             echo "gmsh not found: please install it" >&2
@@ -98,44 +98,55 @@ case "${MESH}" in
             -setnumber meshLevel "${MESH_LEVEL}" \
             gmsh/oscillatingSphereInCube.geo \
             -o gmsh/oscillatingSphereInCube.msh
+        handleErr "$?" log.gmsh
 
         # Convert Gmsh mesh to OpenFOAM format
         runApplication gmshToFoam gmsh/oscillatingSphereInCube.msh
+        handleErr "$?" log.gmshToFoam
 
         if [[ "${MESH}" == "POLY" ]]
         then
             # Convert to polyhedral mesh
             runApplication polyDualMesh 45 -overwrite
+            handleErr "$?" log.polyDualMesh
 
             # Combine faces into larger polygons so that the angle between edges
             # is less than 45 degrees.
             runApplication combinePatchFaces 45 -overwrite
+            handleErr "$?" log.combinePatchFaces
         fi
         ;;
 
     *)
         echo "Invalid mesh type: '${MESH}'." >&2
-        echo "Choose one of QUAD, QUAD_GRADED, TRI or POLY." >&2
+        echo "Choose one of HEX, HEX_GRADED, CARTESIAN, TET or POLY." >&2
         exit 1
         ;;
 esac
 
+exit 0
+
 # Restore the 0/ directory from 0.orig/
 restore0Dir
+handleErr "$?" log.restore0Dir
 
 if [ "$1" = '-p' ];
 then
     # Decopose mesh
     NUMBER_OF_SUBDOMAINS="${NUMBER_OF_SUBDOMAINS}" runApplication decomposePar
+    handleErr "$?" log.decomposePar
 
     # Run the solver (parallel)
     FLUID_MODEL="${FLUID_MODEL}" runParallel "$(getApplication)"
+    handleErr "$?" log."$(getApplication)"
 
     # Deconstruct the result
     runApplication reconstructPar -no-fields -latestTime
+    handleErr "$?" log.reconstructPar
 else
     # Run the solver (serial)
     FLUID_MODEL="${FLUID_MODEL}" runApplication "$(getApplication)"
+    handleErr "$?" log."$(getApplication)"
 fi
 
 # Generate the plots - to-do
