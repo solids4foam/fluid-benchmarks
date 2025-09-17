@@ -120,8 +120,6 @@ case "${MESH}" in
         ;;
 esac
 
-exit 0
-
 # Restore the 0/ directory from 0.orig/
 restore0Dir
 
