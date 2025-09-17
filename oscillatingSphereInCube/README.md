@@ -194,7 +194,7 @@ where
 ```math
 \begin{equation}
     |\mathbf{U}|_{\text{max}}
-  = |\mathbf{U}|_{\text{sph}_\text{max}}
+  = {U_\text{sph}^{x}}_\text{max}
   = 2 \pi h = 2 \pi \frac{D}{8} \, \frac{\mathrm{m}}{\mathrm{s}}.
 \end{equation}
 ```
