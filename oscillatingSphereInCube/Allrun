@@ -223,7 +223,7 @@ do
                 runApplication -suffix '1' projectPatchToSphere sphere '(0 0 0)' 0.5
                 runApplication -suffix '2' projectPatchToSphere sphere '(0 0 0)' 0.5
             fi
-        elif [[ "$MESH" == "TRI" || "$MESH" == "POLY" ]]
+        elif [[ "$MESH" == "TET" || "$MESH" == "POLY" ]]
         then
             if command -v gmsh &> /dev/null
             then
