@@ -84,7 +84,7 @@ case "${MESH}" in
         fi
         ;;
 
-    "TRI" | "POLY")
+    "TET" | "POLY")
         if ! command -v gmsh &> /dev/null
         then
             echo "gmsh not found: please install it" >&2
@@ -115,7 +115,7 @@ case "${MESH}" in
 
     *)
         echo "Invalid mesh type: '${MESH}'." >&2
-        echo "Choose one of QUAD, QUAD_GRADED, TRI or POLY." >&2
+        echo "Choose one of HEX, HEX_GRADED, CARTESIAN, TET or POLY." >&2
         exit 1
         ;;
 esac
@@ -138,16 +138,10 @@ else
     FLUID_MODEL="${FLUID_MODEL}" runApplication "$(getApplication)"
 fi
 
-# Generate the plots - to-do
-cp ../plotScripts/*.gnuplot .
-cp ../verificationData/*.dat .
-
-echo "Generating plots for drag coefficients"
-for script in ./*.gnuplot
-do
-    # TODO(abzrg): update the script so that it does not contain hardcoded
-    #              values, and that it can receive commandline arguments per
-    #              bellow:
-    #                  $ gnuplot -c <script> <datafile> <outfile>
-    gnuplot -c "${script}"
-done
+# Generate the plots
+echo "Generating plots for drag coefficient."
+script="../plotScripts/forceCoeffs.gnuplot"
+dataFile="./postProcessing/forceCoeffs/0/coefficient.dat"
+verificationDataFile="../verificationData/Cd.dat"
+outFile="./Cd.pdf"
+gnuplot -c "${script}" "${dataFile}" "${verificationDataFile}" "${outFile}"

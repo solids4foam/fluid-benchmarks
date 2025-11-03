@@ -28,3 +28,4 @@ Allwmake    text diff=bash
 *.stl   binary
 *.obj   binary
 *.msh   binary
+*.fms   binary

@@ -45,7 +45,7 @@ echo "Building src/correctedFvPatchFields"
 
 # Define configurations as space-separated strings
 configs=(
-    "BASE=base NAME=hex.pimpleFluid MESH=HEX PIMPLEFLUID=1"
+    "BASE=base NAME=cartesian.pimpleFluid MESH=CARTESIAN PIMPLEFLUID=1"
 )
 readonly configs
 # Description
@@ -65,10 +65,7 @@ readonly configs
 # )
 
 # Mesh level (density) range (integer). Higher values correspond to finer
-# meshes. The minimum level is 1 and the maximum level is 8. For finer meshes
-# edit `${BASE}/system/blockMeshDict*` for the quadrilaterial meshes and
-# `${BASE}/gmsh/oscillatingSphereInCube.geo` for the triangular and
-# polyhedral meshes
+# meshes.
 declare -i START_MESH=1
 declare -i END_MESH=4
 readonly START_MESH END_MESH
@@ -151,7 +148,7 @@ do
 
     printf '\n***************************************'
     printf '\n* Running configuration:'
-    printf '\n* - %s' "${config}"
+    printf '\n* - %s' ${config}
     printf '\n***************************************\n'
 
     # Loop over mesh levels (densities) in each configuration
@@ -226,7 +223,7 @@ do
                 runApplication -suffix '1' projectPatchToSphere sphere '(0 0 0)' 0.5
                 runApplication -suffix '2' projectPatchToSphere sphere '(0 0 0)' 0.5
             fi
-        elif [[ "$MESH" == "TRI" || "$MESH" == "POLY" ]]
+        elif [[ "$MESH" == "TET" || "$MESH" == "POLY" ]]
         then
             if command -v gmsh &> /dev/null
             then
@@ -340,12 +337,12 @@ do
         # 6. Plot the force coefficients
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         echo "Generating plots for drag coefficients"
-        cp "${BENCHMARK_ROOT}"/plotScripts/*.gnuplot .
-        cp "${BENCHMARK_ROOT}"/verificationData/*.dat .
-        for script in ./*.gnuplot
-        do
-            gnuplot -c "${script}"
-        done
+        script="${BENCHMARK_ROOT}/plotScripts/forceCoeffs.gnuplot"
+        dataFile="${PWD}/postProcessing/forceCoeffs/0/coefficient.dat"
+        verificationDataFile="${BENCHMARK_ROOT}/verificationData/Cd.dat"
+        outFile="${PWD}/Cd.pdf"
+        gnuplot -c "${script}" \
+                "${dataFile}" "${verificationDataFile}" "${outFile}"
 
         # 7. Run ParaView script
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
